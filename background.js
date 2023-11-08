@@ -1,7 +1,7 @@
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
       id: "viewImage",
-      title: "View Image",
+      title: "Virtual Try-On",
       contexts: ["image"]
     });
   });
@@ -20,6 +20,10 @@ function fetchImageAsBase64(url, callback) {
   
   // This function sends the API request to your server
   function sendApiRequest(sourceImageBase64, targetImageBase64, lastRightClickedImageSrc, tab) {
+    chrome.tabs.sendMessage(tab.id, {
+      action: 'showLoading'
+    });
+    
     const data = {
         "source_image": sourceImageBase64,
         "target_image": targetImageBase64,
@@ -38,7 +42,7 @@ function fetchImageAsBase64(url, callback) {
         "result_file_path": ""
     };
   
-    fetch('https://6399-73-93-232-158.ngrok-free.app/reactor/image', {
+    fetch('https://8xmwgqhgyjyos9-3001.proxy.runpod.net/reactor/image', {
       method: 'POST',
       headers: {
         'accept': 'application/json',
@@ -66,7 +70,8 @@ function fetchImageAsBase64(url, callback) {
     if (info.menuItemId === "viewImage") {
         fetchImageAsBase64(info.srcUrl, (targetImageBase64) => {
         // Assuming 'targetImage.png' is in the 'images' directory of your extension
-        fetchImageAsBase64("https://media.licdn.com/dms/image/C4D03AQGoAc_VqUatvA/profile-displayphoto-shrink_800_800/0/1516999668372?e=1704931200&v=beta&t=P1ySObPY2jbTTlV1fxwlJygUGMaxH1YnW79gfAOaSok", (sourceImageBase64) => {
+        chrome.storage.local.get('uploadedImage', function(data) {
+          const sourceImageBase64 = data.uploadedImage;
           sendApiRequest(sourceImageBase64, targetImageBase64, info.srcUrl, tab);
         });
       });

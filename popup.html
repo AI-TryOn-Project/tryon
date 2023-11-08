@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Image Popup</title>
-  <script src="popup.js"></script>
-  <link rel="stylesheet" type="text/css" href="popup.css">
+    <title>Upload Image</title>
+    <style>
+        body {
+            width: 200px;
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
-  <img id="image-display" src="" alt="Right-clicked image will appear here" style="width: 100%;">
+    <input type="file" id="imageUpload" accept="image/*">
+    <button id="uploadBtn">Upload</button>
+    <script src="popup.js"></script>
 </body>
 </html>
