@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
-    "name": "Image Viewer",
-    "description": "View images on right-click",
+    "name": "fAIshion Virtual Try-On Plugin",
+    "description": "Virtual Try-On on right-click",
     "version": "1.0",
     "permissions": ["contextMenus", "storage", "tabs"],
     "action": {

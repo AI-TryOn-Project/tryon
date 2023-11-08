@@ -1,7 +1,7 @@
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
       id: "viewImage",
-      title: "Virtual Try-On",
+      title: "fAIshion Try-On",
       contexts: ["image"]
     });
   });
@@ -42,7 +42,7 @@ function fetchImageAsBase64(url, callback) {
         "result_file_path": ""
     };
   
-    fetch('https://8xmwgqhgyjyos9-3001.proxy.runpod.net/reactor/image', {
+    fetch('http://154.20.254.95:50392/reactor/image', {
       method: 'POST',
       headers: {
         'accept': 'application/json',
