@@ -42,7 +42,7 @@ function fetchImageAsBase64(url, callback) {
         "result_file_path": ""
     };
   
-    fetch('http://154.20.254.95:50392/reactor/image', {
+    fetch('https://f0c72922396e-11790734418303044228.ngrok-free.app/reactor/image', {
       method: 'POST',
       headers: {
         'accept': 'application/json',
