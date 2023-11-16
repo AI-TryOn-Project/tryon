@@ -6,9 +6,25 @@ chrome.runtime.onInstalled.addListener(() => {
     });
   });
 
-  chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
-    const base64ScreenShot = await chrome.tabs.captureVisibleTab();
-    console.log(base64ScreenShot);
+  chrome.runtime.onMessage.addListener(async function (message, tab, sendResponse) {
+    console.log(message);
+    console.log(message.action);
+    if (message.action === 'capture') {
+      const base64ScreenShot = await chrome.tabs.captureVisibleTab();
+      chrome.storage.local.get('bodyDimensions', function(result) {
+        const userDimensions = result.bodyDimensions || {};
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          const currentTab = tabs[0];
+          if (currentTab) {
+              chrome.tabs.sendMessage(currentTab.id, {
+                  action: 'getRecommendations',
+                  userDimensions: userDimensions,
+                  base64ScreenShot: base64ScreenShot
+              });
+          }
+        });
+      });
+    }
   });
 
 // Fetches an image and converts it to a base64 data URL

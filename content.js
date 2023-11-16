@@ -204,8 +204,80 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             }
         });
     rightClickedElement = null; // Reset the right-clicked element
+  } else if (message.action === 'getRecommendations') {
+    showLoadingPopup('Generating AI size recommendations, Please Wait...');
+    fetchRecommendations(message.userDimensions, message.base64ScreenShot);
   }
 });
+
+function fetchRecommendations(bodyMeasurements, base64ScreenShot) {
+    const apiUrl = 'http://127.0.0.1:5000/get-size-recommendation';
+
+    // Prepare the data to be sent in the POST request
+    const postData = {
+        base64_image: base64ScreenShot,
+        body_measurements: bodyMeasurements
+    };
+
+    fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        createAndShowTextPopup(data)
+    })
+    .catch(error => console.error('Error:', error))
+    .finally(() => {
+        hideLoadingPopup(); // Hide the loading popup regardless of the outcome
+    });
+}
+
+function createAndShowTextPopup(dataText) {
+    // Create the popup container
+    const popupContainer = document.createElement('div');
+    popupContainer.id = 'my-extension-popup-container';
+    popupContainer.style.position = 'fixed';
+    popupContainer.style.top = '20%';
+    popupContainer.style.left = '50%';
+    popupContainer.style.transform = 'translateX(-50%)';
+    popupContainer.style.zIndex = '10000';  // Same z-index as the loading popup
+    popupContainer.style.padding = '20px';
+    popupContainer.style.backgroundColor = 'rgba(255, 255, 255, 1)'; // Similar to loading popup
+    popupContainer.style.borderRadius = '10px';
+    popupContainer.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+    popupContainer.style.maxWidth = '80%';
+    popupContainer.style.maxHeight = '60%';
+    popupContainer.style.overflowY = 'auto';
+
+    // Create the text element
+    const textElement = document.createElement('p');
+    textElement.textContent = dataText;
+    textElement.style.margin = '0';
+
+    // Append the text element to the popup container
+    popupContainer.appendChild(textElement);
+
+    // Create a close button
+    const closeButton = document.createElement('button');
+    closeButton.textContent = 'Close';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.right = '10px';
+    closeButton.onclick = function() {
+        document.body.removeChild(popupContainer);
+    };
+
+    // Append the close button to the popup container
+    popupContainer.appendChild(closeButton);
+
+    // Append the popup container to the body
+    document.body.appendChild(popupContainer);
+}
 
 function fetchAndRenderSizeChart(currentUrl, pageTitle, srcUrl, pageTitle) {
   showLoadingPopup('Generating size recommendation for you...');

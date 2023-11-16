@@ -34,7 +34,7 @@ document.getElementById('saveDimensionsBtn').addEventListener('click', function(
 });
 
 document.getElementById('screenshotButton').addEventListener('click', function() {
-    chrome.runtime.sendMessage({message: 'capture'});
+    chrome.runtime.sendMessage({action: 'capture'});
   });
 
 document.getElementById('uploadBtn').addEventListener('click', function() {
