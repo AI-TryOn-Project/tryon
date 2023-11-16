@@ -6,6 +6,11 @@ chrome.runtime.onInstalled.addListener(() => {
     });
   });
 
+  chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
+    const base64ScreenShot = await chrome.tabs.captureVisibleTab();
+    console.log(base64ScreenShot);
+  });
+
 // Fetches an image and converts it to a base64 data URL
 function fetchImageAsBase64(url, callback) {
     fetch(url)

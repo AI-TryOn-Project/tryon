@@ -3,7 +3,7 @@
     "name": "fAIshion Virtual Try-On Plugin",
     "description": "Virtual Try-On on right-click",
     "version": "1.0",
-    "permissions": ["contextMenus", "storage", "tabs"],
+    "permissions": ["contextMenus", "storage", "tabs", "activeTab"],
     "action": {
       "default_popup": "popup.html"
     },

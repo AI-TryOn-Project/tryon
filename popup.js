@@ -32,7 +32,10 @@ document.getElementById('saveDimensionsBtn').addEventListener('click', function(
         }
     });
 });
-    
+
+document.getElementById('screenshotButton').addEventListener('click', function() {
+    chrome.runtime.sendMessage({message: 'capture'});
+  });
 
 document.getElementById('uploadBtn').addEventListener('click', function() {
     const fileInput = document.getElementById('imageUpload');
