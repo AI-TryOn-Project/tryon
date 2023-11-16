@@ -123,34 +123,53 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
   }
 
   function parseDimensionRange(rangeStr) {
-    const parts = rangeStr.split(' - ').map(Number);
-    // Compare the parts and assign min and max
-    const min = Math.min(parts[0], parts.length > 1 ? parts[1] : parts[0]);
-    const max = Math.max(parts[0], parts.length > 1 ? parts[1] : parts[0]);
-    return { min, max };
-}    
+    // Function to convert fractional sizes to decimal
+    function convertFractionalSize(sizeStr) {
+        if (sizeStr.includes('½')) {
+            return parseFloat(sizeStr.replace('½', '')) + 0.5;
+        } else {
+            return parseFloat(sizeStr);
+        }
+    }
+
+    const parts = rangeStr.split(' - ').map(convertFractionalSize);
+
+    if (parts.length === 1) {
+        // No range, just a single value
+        return { min: parts[0], max: parts[0] };
+    } else {
+        // A range of values
+        return { min: Math.min(...parts), max: Math.max(...parts) };
+    }
+}
+
 
 function highlightUserDimensions(userDimensions) {
-    const rows = document.querySelectorAll('#sizeChartTable tr:not(:first-child)');
-    rows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        const headers = document.querySelectorAll('#sizeChartTable th');
+  const rows = document.querySelectorAll('#sizeChartTable tr:not(:first-child)');
+  rows.forEach(row => {
+      const cells = row.querySelectorAll('td');
+      const headers = document.querySelectorAll('#sizeChartTable th');
 
-        cells.forEach((cell, index) => {
-            const headerText = headers[index].textContent.trim();
-            const userDimensionKey = Object.keys(userDimensions).find(key => key.replace(/\s+/g, '').toLowerCase() === headerText.replace(/\s+/g, '').toLowerCase());
+      cells.forEach((cell, index) => {
+          const headerText = headers[index].textContent.trim();
+          const userDimensionKey = Object.keys(userDimensions).find(key => 
+              key.replace(/\s+/g, '').toLowerCase() === headerText.replace(/\s+/g, '').toLowerCase());
 
-            if (userDimensionKey) {
-                const cellDimensionRange = parseDimensionRange(cell.textContent.trim());
-                const userDimensionValue = Number(userDimensions[userDimensionKey]);
+          if (userDimensionKey) {
+              const cellDimensionRange = parseDimensionRange(cell.textContent.trim());
+              const userDimensionValue = parseFloat(userDimensions[userDimensionKey]);
 
-                if (userDimensionValue >= cellDimensionRange.min && userDimensionValue <= cellDimensionRange.max) {
-                    cell.classList.add('highlight');
-                }
-            }
-        });
-    });
+              // Check if the user dimension is within the range or is the closest match
+              if ((userDimensionValue >= cellDimensionRange.min && userDimensionValue <= cellDimensionRange.max) ||
+                  (cellDimensionRange.min === cellDimensionRange.max && 
+                   Math.abs(cellDimensionRange.min - userDimensionValue) < 1)) {
+                  cell.classList.add('highlight');
+              }
+          }
+      });
+  });
 }
+
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'showLoading') {
