@@ -19,7 +19,7 @@ function fetchImageAsBase64(url, callback) {
   }
   
   // This function sends the API request to your server
-  function sendApiRequest(sourceImageBase64, targetImageBase64, lastRightClickedImageSrc, tab) {
+  function sendApiRequest(sourceImageBase64, targetImageBase64, lastRightClickedImageSrc, tab, pageUrl) {
     chrome.tabs.sendMessage(tab.id, {
       action: 'showLoading'
     });
@@ -54,11 +54,19 @@ function fetchImageAsBase64(url, callback) {
     .then(data => {
       const imageBase64 = data.image;
       console.log("finished processubg")
-      chrome.tabs.sendMessage(tab.id, {
-        action: 'replaceImage',
-        srcUrl: lastRightClickedImageSrc,
-        newImageBase64: 'data:image/png;base64,' + imageBase64 // your new image data
+
+      chrome.storage.local.get('bodyDimensions', function(result) {
+          const userDimensions = result.bodyDimensions || {};
+          chrome.tabs.sendMessage(tab.id, {
+            action: 'replaceImage',
+            srcUrl: lastRightClickedImageSrc,
+            userDimensions: userDimensions,
+            productUrl: pageUrl,
+            pageTitle: tab.title,
+            newImageBase64: 'data:image/png;base64,' + imageBase64 // your new image data
+          });
       });
+
     })
     .catch(error => {
       console.error('Error:', error);
@@ -72,7 +80,7 @@ function fetchImageAsBase64(url, callback) {
         // Assuming 'targetImage.png' is in the 'images' directory of your extension
         chrome.storage.local.get('uploadedImage', function(data) {
           const sourceImageBase64 = data.uploadedImage;
-          sendApiRequest(sourceImageBase64, targetImageBase64, info.srcUrl, tab);
+          sendApiRequest(sourceImageBase64, targetImageBase64, info.srcUrl, tab, info.pageUrl);
         });
       });
     }

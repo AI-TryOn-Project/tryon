@@ -6,7 +6,7 @@ document.addEventListener('contextmenu', (event) => {
   }
 }, true);
 
-function createPopup(imageBase64) {
+function createPopup(imageBase64, sizeChartData) {
     // Create the popup container
     const popupContainer = document.createElement('div');
     popupContainer.id = 'my-extension-image-popup';
@@ -42,6 +42,46 @@ function createPopup(imageBase64) {
     // Append the image and close button to the popup
     popupContainer.appendChild(imageElement);
     popupContainer.appendChild(closeButton);
+
+
+    // Create the size chart container
+    const sizeChartContainer = document.createElement('div');
+    sizeChartContainer.style.marginTop = '20px';
+  
+    // Create the size chart table
+    const sizeChartTable = document.createElement('table');
+    sizeChartTable.style.width = '100%';
+    sizeChartTable.style.borderCollapse = 'collapse';
+  
+    // Add headers to the table
+    const headerRow = document.createElement('tr');
+    Object.keys(sizeChartData[0]).forEach(key => {
+        const headerCell = document.createElement('th');
+        headerCell.textContent = key;
+        headerCell.style.border = '1px solid black';
+        headerCell.style.padding = '5px';
+        headerRow.appendChild(headerCell);
+    });
+    sizeChartTable.appendChild(headerRow);
+  
+    // Add data to the table
+    sizeChartData.forEach(item => {
+        const dataRow = document.createElement('tr');
+        Object.values(item).forEach(value => {
+            const dataCell = document.createElement('td');
+            dataCell.textContent = value;
+            dataCell.style.border = '1px solid black';
+            dataCell.style.padding = '5px';
+            dataRow.appendChild(dataCell);
+        });
+        sizeChartTable.appendChild(dataRow);
+    });
+  
+    // Append the size chart table to its container
+    sizeChartContainer.appendChild(sizeChartTable);
+  
+    // Append the size chart container to the popup
+    popupContainer.appendChild(sizeChartContainer);
   
     // Add the popup to the body
     document.body.appendChild(popupContainer);
@@ -53,10 +93,42 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   else if (message.action === 'replaceImage') {
     hideLoadingPopup();
-    createPopup(message.newImageBase64);
+
+    fetchAndRenderSizeChart(message.productUrl, message.pageTitle)
+        .then(sizeChartData => {
+            if (sizeChartData) {
+                createPopup(message.newImageBase64, sizeChartData);
+            } else {
+                // Handle the case where size chart data couldn't be fetched
+                console.log("Failed to fetch size chart data.");
+            }
+        });
     rightClickedElement = null; // Reset the right-clicked element
   }
 });
+
+function fetchAndRenderSizeChart(currentUrl, pageTitle) {
+  const apiUrl = `http://127.0.0.1:5000/get-size-guide?category_id=bottoms-women&product_url=${encodeURIComponent(currentUrl)}&page_title=${encodeURIComponent(pageTitle)}`;
+
+  return fetch(apiUrl)
+      .then(response => {
+          if (!response.ok) {
+              if (response.status === 404) {
+                  console.log('Size guide not found');
+              }
+              throw new Error('Error fetching size guide');
+          }
+          return response.json();
+      })
+      .then(data => {
+          // This data will now be used in createPopup
+          return data;
+      })
+      .catch(error => {
+          console.error('Error:', error);
+          return null; // Return null to indicate an error
+      });
+}
 
 function showLoadingPopup() {
   const loadingPopup = document.createElement('div');

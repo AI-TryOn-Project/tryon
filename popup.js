@@ -8,35 +8,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Function to make the API call and render the size chart
-    function fetchAndRenderSizeChart(userDimensions) {
-
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            const currentTab = tabs[0];
-            if (!currentTab || !currentTab.url || !currentTab.title) {
-                console.error('No active tab found');
-                return;
-            }
-    
-            const currentUrl = currentTab.url;
-            const apiUrl = `http://127.0.0.1:5000/get-size-guide?category_id=bottoms-women&product_url=${encodeURIComponent(currentUrl)}&page_title=${encodeURIComponent(pageTitle)}`;
-    
-            fetch(apiUrl)
-            .then(response => {
-                if (!response.ok && response.status === 404) {
-                    console.log('Size guide not found');
-                }
-                return response.json();
-            })
-            .then(data => {
-                renderSizeChart(data, userDimensions);
-            })
-            .catch(error => {
-                console.error('Error fetching size guide:', error);
-            });
-        });
-    }
-
     // Save new values
     document.getElementById('saveDimensionsBtn').addEventListener('click', function() {
         const bust = document.getElementById('bustInput').value;
@@ -59,15 +30,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Dimensions saved successfully!');
             }
         });
-    });
-
-    // When fetching and displaying existing values...
-    chrome.storage.local.get('bodyDimensions', function(result) {
-        if (result.bodyDimensions) {
-            fetchAndRenderSizeChart(result.bodyDimensions);
-        } else {
-            fetchAndRenderSizeChart({});
-        }
     });
 
     function parseDimensionRange(rangeStr) {
