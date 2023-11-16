@@ -6,7 +6,21 @@ document.addEventListener('contextmenu', (event) => {
   }
 }, true);
 
-function createPopup(imageBase64, sizeChartData) {
+function addStyles() {
+  const styleElement = document.createElement('style');
+  styleElement.type = 'text/css';
+  styleElement.textContent = `
+      .highlight {
+          background-color: yellow;
+      }
+  `;
+  document.head.appendChild(styleElement);
+}
+
+// Call this function early in your content script
+addStyles();
+
+function createPopup(imageBase64, sizeChartData, userDimensions) {
     // Create the popup container
     const popupContainer = document.createElement('div');
     popupContainer.id = 'my-extension-image-popup';
@@ -40,6 +54,7 @@ function createPopup(imageBase64, sizeChartData) {
   
     // Create the size chart table
     const sizeChartTable = document.createElement('table');
+    sizeChartTable.id = 'sizeChartTable'; // Assign the ID
     sizeChartTable.style.width = '100%';
     sizeChartTable.style.borderCollapse = 'collapse';
   
@@ -89,7 +104,39 @@ function createPopup(imageBase64, sizeChartData) {
   
     // Add the popup to the body
     document.body.appendChild(popupContainer);
+
+    highlightUserDimensions(userDimensions);
   }
+
+  function parseDimensionRange(rangeStr) {
+    const parts = rangeStr.split(' - ').map(Number);
+    // Compare the parts and assign min and max
+    const min = Math.min(parts[0], parts.length > 1 ? parts[1] : parts[0]);
+    const max = Math.max(parts[0], parts.length > 1 ? parts[1] : parts[0]);
+    return { min, max };
+}    
+
+function highlightUserDimensions(userDimensions) {
+    const rows = document.querySelectorAll('#sizeChartTable tr:not(:first-child)');
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        const headers = document.querySelectorAll('#sizeChartTable th');
+
+        cells.forEach((cell, index) => {
+            const headerText = headers[index].textContent.trim();
+            const userDimensionKey = Object.keys(userDimensions).find(key => key.replace(/\s+/g, '').toLowerCase() === headerText.replace(/\s+/g, '').toLowerCase());
+
+            if (userDimensionKey) {
+                const cellDimensionRange = parseDimensionRange(cell.textContent.trim());
+                const userDimensionValue = Number(userDimensions[userDimensionKey]);
+
+                if (userDimensionValue >= cellDimensionRange.min && userDimensionValue <= cellDimensionRange.max) {
+                    cell.classList.add('highlight');
+                }
+            }
+        });
+    });
+}
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'showLoading') {
@@ -101,7 +148,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     fetchAndRenderSizeChart(message.productUrl, message.pageTitle)
         .then(sizeChartData => {
             if (sizeChartData) {
-                createPopup(message.newImageBase64, sizeChartData);
+                createPopup(message.newImageBase64, sizeChartData, message.userDimensions);
             } else {
                 // Handle the case where size chart data couldn't be fetched
                 console.log("Failed to fetch size chart data.");
