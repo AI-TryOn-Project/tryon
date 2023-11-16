@@ -146,6 +146,9 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
 
 function highlightUserDimensions(userDimensions) {
   const rows = document.querySelectorAll('#sizeChartTable tr:not(:first-child)');
+  let closestCell = null;
+  let closestDistance = Infinity;
+
   rows.forEach(row => {
       const cells = row.querySelectorAll('td');
       const headers = document.querySelectorAll('#sizeChartTable th');
@@ -160,16 +163,29 @@ function highlightUserDimensions(userDimensions) {
               const userDimensionValue = parseFloat(userDimensions[userDimensionKey]);
 
               // Check if the user dimension is within the range or is the closest match
-              if ((userDimensionValue >= cellDimensionRange.min && userDimensionValue <= cellDimensionRange.max) ||
-                  (cellDimensionRange.min === cellDimensionRange.max && 
-                   Math.abs(cellDimensionRange.min - userDimensionValue) < 1)) {
+              if (userDimensionValue >= cellDimensionRange.min && userDimensionValue <= cellDimensionRange.max) {
                   cell.classList.add('highlight');
+                  return; // Exit the function as we found an exact or within-range match
+              } else {
+                  // Determine if this cell is the closest match so far
+                  const distance = Math.min(
+                      Math.abs(cellDimensionRange.min - userDimensionValue),
+                      Math.abs(cellDimensionRange.max - userDimensionValue)
+                  );
+                  if (distance < closestDistance) {
+                      closestDistance = distance;
+                      closestCell = cell;
+                  }
               }
           }
       });
   });
-}
 
+  // If no exact match was found, highlight the closest cell
+  if (closestCell && closestDistance < Infinity) {
+      closestCell.classList.add('highlight');
+  }
+}
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'showLoading') {
