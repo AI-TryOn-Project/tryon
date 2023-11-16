@@ -13,13 +13,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
             const currentTab = tabs[0];
-            if (!currentTab || !currentTab.url) {
+            if (!currentTab || !currentTab.url || !currentTab.title) {
                 console.error('No active tab found');
                 return;
             }
     
             const currentUrl = currentTab.url;
-            const apiUrl = `http://127.0.0.1:5000/get-size-guide?category_id=bottoms-women&product_url=${encodeURIComponent(currentUrl)}`;
+            const apiUrl = `http://127.0.0.1:5000/get-size-guide?category_id=bottoms-women&product_url=${encodeURIComponent(currentUrl)}&page_title=${encodeURIComponent(pageTitle)}`;
     
             fetch(apiUrl)
             .then(response => {
@@ -72,19 +72,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function parseDimensionRange(rangeStr) {
         const parts = rangeStr.split(' - ').map(Number);
-        return { min: parts[0], max: parts.length > 1 ? parts[1] : parts[0] };
-    }
+        // Compare the parts and assign min and max
+        const min = Math.min(parts[0], parts.length > 1 ? parts[1] : parts[0]);
+        const max = Math.max(parts[0], parts.length > 1 ? parts[1] : parts[0]);
+        return { min, max };
+    }    
 
     function highlightUserDimensions(userDimensions) {
         const rows = document.querySelectorAll('#sizeChartTable tr:not(:first-child)');
         rows.forEach(row => {
             const cells = row.querySelectorAll('td');
+            const headers = document.querySelectorAll('#sizeChartTable th');
+    
             cells.forEach((cell, index) => {
-                // Match the index with the corresponding user dimension
-                const dimensionKey = Object.keys(userDimensions)[index];
-                if (dimensionKey) {
+                const headerText = headers[index].textContent.trim();
+                const userDimensionKey = Object.keys(userDimensions).find(key => key.replace(/\s+/g, '').toLowerCase() === headerText.replace(/\s+/g, '').toLowerCase());
+    
+                if (userDimensionKey) {
                     const cellDimensionRange = parseDimensionRange(cell.textContent.trim());
-                    const userDimensionValue = Number(userDimensions[dimensionKey]);
+                    const userDimensionValue = Number(userDimensions[userDimensionKey]);
     
                     if (userDimensionValue >= cellDimensionRange.min && userDimensionValue <= cellDimensionRange.max) {
                         cell.classList.add('highlight');
@@ -93,6 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+    
 
     function renderSizeChart(data, userDimensions) {
         if (!data || !data.length) {
