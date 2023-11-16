@@ -20,33 +20,23 @@ function createPopup(imageBase64, sizeChartData) {
     popupContainer.style.border = '1px solid black';
     popupContainer.style.borderRadius = '8px';
     popupContainer.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
-  
-     // Create the image element
-     const imageElement = document.createElement('img');
-     imageElement.src = imageBase64;
-     imageElement.style.maxWidth = '80vw'; // max width as 80% of the viewport width
-     imageElement.style.maxHeight = '80vh'; // max height as 80% of the viewport height
-     imageElement.style.width = 'auto'; // maintain aspect ratio
-     imageElement.style.height = 'auto'; // maintain aspect ratio
-     imageElement.style.borderRadius = '4px';
- 
-  
-    // Create a close button
-    const closeButton = document.createElement('button');
-    closeButton.textContent = 'Close';
-    closeButton.onclick = function() {
-      document.body.removeChild(popupContainer);
-    };
-    closeButton.style.marginTop = '10px';
-  
-    // Append the image and close button to the popup
-    popupContainer.appendChild(imageElement);
-    popupContainer.appendChild(closeButton);
+    popupContainer.style.display = 'flex'; // Enable flexbox
+    popupContainer.style.justifyContent = 'center'; // Center items horizontally
+    popupContainer.style.alignItems = 'center'; // Center items vertically
 
+    // Create the image element
+    const imageElement = document.createElement('img');
+    imageElement.src = imageBase64;
+    imageElement.style.maxWidth = '40vw'; // Adjust width as needed
+    imageElement.style.maxHeight = '80vh'; // max height as 80% of the viewport height
+    imageElement.style.width = 'auto'; // maintain aspect ratio
+    imageElement.style.height = 'auto'; // maintain aspect ratio
+    imageElement.style.borderRadius = '4px';
+    imageElement.style.marginRight = '20px'; // Add some space between the image and the size chart
 
     // Create the size chart container
     const sizeChartContainer = document.createElement('div');
-    sizeChartContainer.style.marginTop = '20px';
+    sizeChartContainer.style.maxWidth = '50vw'; // Adjust width as needed
   
     // Create the size chart table
     const sizeChartTable = document.createElement('table');
@@ -79,9 +69,23 @@ function createPopup(imageBase64, sizeChartData) {
   
     // Append the size chart table to its container
     sizeChartContainer.appendChild(sizeChartTable);
-  
+    // Append the image and close button to the popup
+    popupContainer.appendChild(imageElement);
     // Append the size chart container to the popup
     popupContainer.appendChild(sizeChartContainer);
+
+    // Create a close button
+    const closeButton = document.createElement('button');
+    closeButton.textContent = 'Close';
+    closeButton.onclick = function() {
+        document.body.removeChild(popupContainer);
+    };
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.right = '10px';
+
+    // Append the close button to the popup
+    popupContainer.appendChild(closeButton);
   
     // Add the popup to the body
     document.body.appendChild(popupContainer);
