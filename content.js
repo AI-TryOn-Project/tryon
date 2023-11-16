@@ -173,27 +173,40 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 function fetchAndRenderSizeChart(currentUrl, pageTitle) {
-  const apiUrl = `http://127.0.0.1:5000/get-size-guide?category_id=bottoms-women&product_url=${encodeURIComponent(currentUrl)}&page_title=${encodeURIComponent(pageTitle)}`;
+  const apiUrl = `http://127.0.0.1:5000/get-size-guide`;
 
-  return fetch(apiUrl)
-      .then(response => {
-          if (!response.ok) {
-              if (response.status === 404) {
-                  console.log('Size guide not found');
-                  return null; // Return null to indicate no data
-              }
-              throw new Error('Error fetching size guide');
+  // Prepare the data to be sent in the POST request
+  const postData = {
+      category_id: 'bottoms-women',
+      product_url: currentUrl,
+      page_title: pageTitle
+  };
+
+  return fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(postData)
+  })
+  .then(response => {
+      if (!response.ok) {
+          if (response.status === 404) {
+              console.log('Size guide not found');
+              return null; // Return null to indicate no data
           }
-          return response.json();
-      })
-      .then(data => {
-          // This data will now be used in createPopup
-          return data;
-      })
-      .catch(error => {
-          console.error('Error:', error);
-          return null; // Return null to indicate an error
-      });
+          throw new Error('Error fetching size guide');
+      }
+      return response.json();
+  })
+  .then(data => {
+      // This data will now be used in createPopup
+      return data;
+  })
+  .catch(error => {
+      console.error('Error:', error);
+      return null; // Return null to indicate an error
+  });
 }
 
 function showLoadingPopup() {
