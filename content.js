@@ -154,12 +154,12 @@ function highlightUserDimensions(userDimensions) {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'showLoading') {
-    showLoadingPopup();
+    showLoadingPopup('Generating Virtual Try-On, Please Wait...');
   }
   else if (message.action === 'replaceImage') {
     hideLoadingPopup();
 
-    fetchAndRenderSizeChart(message.productUrl, message.pageTitle)
+    fetchAndRenderSizeChart(message.productUrl, message.pageTitle, message.srcUrl, message.pageTitle)
         .then(sizeChartData => {
             if (sizeChartData) {
                 createPopup(message.newImageBase64, sizeChartData, message.userDimensions);
@@ -172,13 +172,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-function fetchAndRenderSizeChart(currentUrl, pageTitle) {
+function fetchAndRenderSizeChart(currentUrl, pageTitle, srcUrl, pageTitle) {
+  showLoadingPopup('Generating size recommendation for you...');
   const apiUrl = `http://127.0.0.1:5000/get-size-guide`;
 
   // Prepare the data to be sent in the POST request
   const postData = {
       category_id: 'bottoms-women',
       product_url: currentUrl,
+      page_title: pageTitle,
+      img_src_url: srcUrl,
       page_title: pageTitle
   };
 
@@ -206,10 +209,13 @@ function fetchAndRenderSizeChart(currentUrl, pageTitle) {
   .catch(error => {
       console.error('Error:', error);
       return null; // Return null to indicate an error
+  })
+  .finally(() => {
+      hideLoadingPopup(); // Hide the loading popup regardless of the outcome
   });
 }
 
-function showLoadingPopup() {
+function showLoadingPopup(loadingText) {
   const loadingPopup = document.createElement('div');
   loadingPopup.id = 'my-extension-loading-popup';
   loadingPopup.style.position = 'fixed';
@@ -235,7 +241,7 @@ function showLoadingPopup() {
   spinner.style.animation = 'spin 1s linear infinite';
 
   const spinnerText = document.createElement('div');
-  spinnerText.textContent = 'Generating Virtual Try-On, Please Wait...';
+  spinnerText.textContent = loadingText;
   spinnerText.style.marginTop = '10px';
 
   loadingPopup.appendChild(spinner);
