@@ -4,14 +4,43 @@
     <title>Upload Image</title>
     <style>
         body {
-            width: 200px;
+            width: 300px;
             padding: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        .highlight {
+            background-color: yellow;
         }
     </style>
 </head>
 <body>
     <input type="file" id="imageUpload" accept="image/*">
-    <button id="uploadBtn">Upload</button>
+    <button id="uploadBtn">Upload</button><br>
+    <label for="bustInput">Bust (inches):</label><br>
+    <input type="number" id="bustInput" placeholder="Bust (inches)"><br>
+    
+    <label for="waistInput">Waist (inches):</label><br>
+    <input type="number" id="waistInput" placeholder="Waist (inches)"><br>
+    
+    <label for="hipsInput">Hips (inches):</label><br>
+    <input type="number" id="hipsInput" placeholder="Hips (inches)"><br>
+    
+    <button id="saveDimensionsBtn">Save Dimensions</button>
+    
     <script src="popup.js"></script>
 </body>
 </html>
