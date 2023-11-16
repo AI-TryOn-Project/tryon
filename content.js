@@ -51,39 +51,51 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
     // Create the size chart container
     const sizeChartContainer = document.createElement('div');
     sizeChartContainer.style.maxWidth = '50vw'; // Adjust width as needed
+
+
+    if (sizeChartData) {
   
-    // Create the size chart table
-    const sizeChartTable = document.createElement('table');
-    sizeChartTable.id = 'sizeChartTable'; // Assign the ID
-    sizeChartTable.style.width = '100%';
-    sizeChartTable.style.borderCollapse = 'collapse';
-  
-    // Add headers to the table
-    const headerRow = document.createElement('tr');
-    Object.keys(sizeChartData[0]).forEach(key => {
-        const headerCell = document.createElement('th');
-        headerCell.textContent = key;
-        headerCell.style.border = '1px solid black';
-        headerCell.style.padding = '5px';
-        headerRow.appendChild(headerCell);
-    });
-    sizeChartTable.appendChild(headerRow);
-  
-    // Add data to the table
-    sizeChartData.forEach(item => {
-        const dataRow = document.createElement('tr');
-        Object.values(item).forEach(value => {
-            const dataCell = document.createElement('td');
-            dataCell.textContent = value;
-            dataCell.style.border = '1px solid black';
-            dataCell.style.padding = '5px';
-            dataRow.appendChild(dataCell);
-        });
-        sizeChartTable.appendChild(dataRow);
-    });
-  
-    // Append the size chart table to its container
-    sizeChartContainer.appendChild(sizeChartTable);
+      // Create the size chart table
+      const sizeChartTable = document.createElement('table');
+      sizeChartTable.id = 'sizeChartTable'; // Assign the ID
+      sizeChartTable.style.width = '100%';
+      sizeChartTable.style.borderCollapse = 'collapse';
+    
+      // Add headers to the table
+      const headerRow = document.createElement('tr');
+      Object.keys(sizeChartData[0]).forEach(key => {
+          const headerCell = document.createElement('th');
+          headerCell.textContent = key;
+          headerCell.style.border = '1px solid black';
+          headerCell.style.padding = '5px';
+          headerRow.appendChild(headerCell);
+      });
+      sizeChartTable.appendChild(headerRow);
+    
+      // Add data to the table
+      sizeChartData.forEach(item => {
+          const dataRow = document.createElement('tr');
+          Object.values(item).forEach(value => {
+              const dataCell = document.createElement('td');
+              dataCell.textContent = value;
+              dataCell.style.border = '1px solid black';
+              dataCell.style.padding = '5px';
+              dataRow.appendChild(dataCell);
+          });
+          sizeChartTable.appendChild(dataRow);
+      });
+      // Append the size chart table to its container
+      sizeChartContainer.appendChild(sizeChartTable);
+        const message = document.createElement('p');
+        message.textContent = "Inaccurate or outdated size chart? Use our plugin to take the current size chart and see our size recommendation.";
+        sizeChartContainer.appendChild(message);
+
+    } else {
+      // Fallback message when size chart is not available
+      const fallbackMessage = document.createElement('p');
+      fallbackMessage.textContent = "We don't have a size chart for this apparel on file. Try taking a screenshot of the size chart and see our size recommendation.";
+      sizeChartContainer.appendChild(fallbackMessage);
+    }
     // Append the image and close button to the popup
     popupContainer.appendChild(imageElement);
     // Append the size chart container to the popup
@@ -105,7 +117,9 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
     // Add the popup to the body
     document.body.appendChild(popupContainer);
 
-    highlightUserDimensions(userDimensions);
+    if (sizeChartData) {
+      highlightUserDimensions(userDimensions);
+    }
   }
 
   function parseDimensionRange(rangeStr) {
@@ -166,6 +180,7 @@ function fetchAndRenderSizeChart(currentUrl, pageTitle) {
           if (!response.ok) {
               if (response.status === 404) {
                   console.log('Size guide not found');
+                  return null; // Return null to indicate no data
               }
               throw new Error('Error fetching size guide');
           }

@@ -7,30 +7,31 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('hipsInput').value = result.bodyDimensions.hips || '';
         }
     });
+});
 
-    // Save new values
-    document.getElementById('saveDimensionsBtn').addEventListener('click', function() {
-        const bust = document.getElementById('bustInput').value;
-        const waist = document.getElementById('waistInput').value;
-        const hips = document.getElementById('hipsInput').value;
+// Save new values
+document.getElementById('saveDimensionsBtn').addEventListener('click', function() {
+    const bust = document.getElementById('bustInput').value;
+    const waist = document.getElementById('waistInput').value;
+    const hips = document.getElementById('hipsInput').value;
 
-        // Validation
-        if (!bust || !waist || !hips) {
-            alert('Please enter all dimensions (Bust, Waist, Hips)');
-            return;
+    // Validation
+    if (!bust || !waist || !hips) {
+        alert('Please enter all dimensions (Bust, Waist, Hips)');
+        return;
+    }
+
+    // Save to local storage
+    chrome.storage.local.set({ 
+        'bodyDimensions': { bust, waist, hips }
+    }, function() {
+        if (chrome.runtime.lastError) {
+            alert('An error occurred: ' + chrome.runtime.lastError.message);
+        } else {
+            alert('Dimensions saved successfully!');
         }
-
-        // Save to local storage
-        chrome.storage.local.set({ 
-            'bodyDimensions': { bust, waist, hips }
-        }, function() {
-            if (chrome.runtime.lastError) {
-                alert('An error occurred: ' + chrome.runtime.lastError.message);
-            } else {
-                alert('Dimensions saved successfully!');
-            }
-        });
     });
+});
     
 
 document.getElementById('uploadBtn').addEventListener('click', function() {
