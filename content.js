@@ -54,7 +54,6 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
 
 
     if (sizeChartData) {
-  
       // Create the size chart table
       const sizeChartTable = document.createElement('table');
       sizeChartTable.id = 'sizeChartTable'; // Assign the ID
@@ -89,7 +88,6 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
         const message = document.createElement('p');
         message.textContent = "Inaccurate or outdated size chart? Use our plugin to take the current size chart and see our size recommendation.";
         sizeChartContainer.appendChild(message);
-
     } else {
       // Fallback message when size chart is not available
       const fallbackMessage = document.createElement('p');
@@ -196,12 +194,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     fetchAndRenderSizeChart(message.productUrl, message.pageTitle, message.srcUrl, message.pageTitle)
         .then(sizeChartData => {
-            if (sizeChartData) {
-                createPopup(message.newImageBase64, sizeChartData, message.userDimensions);
-            } else {
-                // Handle the case where size chart data couldn't be fetched
-                console.log("Failed to fetch size chart data.");
-            }
+            createPopup(message.newImageBase64, sizeChartData, message.userDimensions);
         });
     rightClickedElement = null; // Reset the right-clicked element
   } else if (message.action === 'getRecommendations') {
@@ -211,7 +204,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 function fetchRecommendations(bodyMeasurements, base64ScreenShot) {
-    const apiUrl = 'http://127.0.0.1:5000/get-size-recommendation';
+    const apiUrl = 'https://api.tianlong.co.uk/get-size-recommendation';
 
     // Prepare the data to be sent in the POST request
     const postData = {
@@ -281,7 +274,7 @@ function createAndShowTextPopup(dataText) {
 
 function fetchAndRenderSizeChart(currentUrl, pageTitle, srcUrl, pageTitle) {
   showLoadingPopup('Generating size recommendation for you...');
-  const apiUrl = `http://127.0.0.1:5000/get-size-guide`;
+  const apiUrl = 'https://api.tianlong.co.uk/get-size-guide';
 
   // Prepare the data to be sent in the POST request
   const postData = {
@@ -305,7 +298,8 @@ function fetchAndRenderSizeChart(currentUrl, pageTitle, srcUrl, pageTitle) {
               console.log('Size guide not found');
               return null; // Return null to indicate no data
           }
-          throw new Error('Error fetching size guide');
+          console.log('Failed to get size guide');
+          return null;
       }
       return response.json();
   })
