@@ -102,37 +102,46 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
     sizeChartContainer.style.maxWidth = '50%'; // Adjust max width as needed
 
     if (sizeChartData) {
-      // Create the size chart table
-      const sizeChartTable = document.createElement('table');
-      sizeChartTable.id = 'sizeChartTable'; // Assign the ID
-      sizeChartTable.style.width = '100%';
-      sizeChartTable.style.borderCollapse = 'collapse';
+        // Create the size chart table
+        const sizeChartTable = document.createElement('table');
+        sizeChartTable.id = 'sizeChartTable';
+        sizeChartTable.style.width = '100%';
+        sizeChartTable.style.borderCollapse = 'collapse';
     
-      // Add headers to the table
-      const headerRow = document.createElement('tr');
-      Object.keys(sizeChartData[0]).forEach(key => {
-          const headerCell = document.createElement('th');
-          headerCell.textContent = key;
-          headerCell.style.border = '1px solid black';
-          headerCell.style.padding = '5px';
-          headerRow.appendChild(headerCell);
-      });
-      sizeChartTable.appendChild(headerRow);
+        // Function to reorder keys with 'Size' as the first key
+        const reorderKeysWithSizeFirst = (obj) => {
+            const { Size, ...rest } = obj;
+            return { Size, ...rest };
+        };
     
-      // Add data to the table
-      sizeChartData.forEach(item => {
-          const dataRow = document.createElement('tr');
-          Object.values(item).forEach(value => {
-              const dataCell = document.createElement('td');
-              dataCell.textContent = value;
-              dataCell.style.border = '1px solid black';
-              dataCell.style.padding = '5px';
-              dataRow.appendChild(dataCell);
-          });
-          sizeChartTable.appendChild(dataRow);
-      });
-      // Append the size chart table to its container
-      sizeChartContainer.appendChild(sizeChartTable);
+        // Add headers to the table
+        const headerRow = document.createElement('tr');
+        const orderedKeys = Object.keys(reorderKeysWithSizeFirst(sizeChartData[0]));
+        orderedKeys.forEach(key => {
+            const headerCell = document.createElement('th');
+            headerCell.textContent = key;
+            headerCell.style.border = '1px solid black';
+            headerCell.style.padding = '5px';
+            headerRow.appendChild(headerCell);
+        });
+        sizeChartTable.appendChild(headerRow);
+    
+        // Add data to the table
+        sizeChartData.forEach(item => {
+            const dataRow = document.createElement('tr');
+            const orderedItem = reorderKeysWithSizeFirst(item);
+            Object.values(orderedItem).forEach(value => {
+                const dataCell = document.createElement('td');
+                dataCell.textContent = value;
+                dataCell.style.border = '1px solid black';
+                dataCell.style.padding = '5px';
+                dataRow.appendChild(dataCell);
+            });
+            sizeChartTable.appendChild(dataRow);
+        });
+    
+        // Append the size chart table to its container
+        sizeChartContainer.appendChild(sizeChartTable);
         const message = document.createElement('p');
         message.textContent = "Inaccurate or outdated size chart? Use our plugin to take the current size chart and see our size recommendation.";
         sizeChartContainer.appendChild(message);
@@ -154,7 +163,7 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
         document.body.removeChild(popupContainer);
     };
     closeButton.style.position = 'absolute';
-    closeButton.style.top = '10px';
+    closeButton.style.bottom = '10px';
     closeButton.style.right = '10px';
 
     // Append the close button to the popup
@@ -191,48 +200,67 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
     }
 }
 
-
 function highlightUserDimensions(userDimensions) {
-  const rows = document.querySelectorAll('#sizeChartTable tr:not(:first-child)');
-  let closestCell = null;
-  let closestDistance = Infinity;
+    const rows = document.querySelectorAll('#sizeChartTable tr:not(:first-child)');
+    let closestCell = null;
+    let closestDistance = Infinity;
 
-  rows.forEach(row => {
-      const cells = row.querySelectorAll('td');
-      const headers = document.querySelectorAll('#sizeChartTable th');
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        const headers = document.querySelectorAll('#sizeChartTable th');
 
-      cells.forEach((cell, index) => {
-          const headerText = headers[index].textContent.trim();
-          const userDimensionKey = Object.keys(userDimensions).find(key => 
-              key.replace(/\s+/g, '').toLowerCase() === headerText.replace(/\s+/g, '').toLowerCase());
+        cells.forEach((cell, index) => {
+            const headerText = headers[index].textContent.trim().replace(/\s+/g, '').toLowerCase();
+            let userDimensionKey = Object.keys(userDimensions).find(key => 
+                key.replace(/\s+/g, '').toLowerCase() === headerText);
 
-          if (userDimensionKey) {
-              const cellDimensionRange = parseDimensionRange(cell.textContent.trim());
-              const userDimensionValue = parseFloat(userDimensions[userDimensionKey]);
+            // Check for Bust/Chest equivalence
+            if (!userDimensionKey && (headerText === 'bust' || headerText === 'chest')) {
+                userDimensionKey = ['bust', 'chest'].find(key => key in userDimensions);
+            }
 
-              // Check if the user dimension is within the range or is the closest match
-              if (userDimensionValue >= cellDimensionRange.min && userDimensionValue <= cellDimensionRange.max) {
-                  cell.classList.add('highlight');
-                  return; // Exit the function as we found an exact or within-range match
-              } else {
-                  // Determine if this cell is the closest match so far
-                  const distance = Math.min(
-                      Math.abs(cellDimensionRange.min - userDimensionValue),
-                      Math.abs(cellDimensionRange.max - userDimensionValue)
-                  );
-                  if (distance < closestDistance) {
-                      closestDistance = distance;
-                      closestCell = cell;
-                  }
-              }
-          }
-      });
-  });
+            if (userDimensionKey) {
+                const cellDimensionRange = parseDimensionRange(cell.textContent.trim());
+                const userDimensionValue = parseFloat(userDimensions[userDimensionKey]);
 
-  // If no exact match was found, highlight the closest cell
-  if (closestCell && closestDistance < Infinity) {
-      closestCell.classList.add('highlight');
-  }
+                // Check if the user dimension is within the range
+                if (userDimensionValue >= cellDimensionRange.min && userDimensionValue <= cellDimensionRange.max) {
+                    if (closestCell && closestDistance === 0) {
+                        // If there's already an exact match, compare which one is more precise
+                        const currentDistance = cellDimensionRange.max - cellDimensionRange.min;
+                        if (currentDistance < closestDistance) {
+                            closestCell.classList.remove('highlight');
+                            cell.classList.add('highlight');
+                            closestDistance = currentDistance;
+                        }
+                    } else {
+                        // Found a matching range
+                        cell.classList.add('highlight');
+                        closestDistance = cellDimensionRange.max - cellDimensionRange.min;
+                        closestCell = cell;
+                    }
+                } else if (closestDistance !== 0) {
+                    // Determine if this cell is the closest match so far
+                    const distance = Math.min(
+                        Math.abs(cellDimensionRange.min - userDimensionValue),
+                        Math.abs(cellDimensionRange.max - userDimensionValue)
+                    );
+                    if (distance < closestDistance) {
+                        if (closestCell) {
+                            closestCell.classList.remove('highlight');
+                        }
+                        closestDistance = distance;
+                        closestCell = cell;
+                    }
+                }
+            }
+        });
+    });
+
+    // Highlight the closest cell if no exact match was found
+    if (closestCell && closestDistance !== 0) {
+        closestCell.classList.add('highlight');
+    }
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {

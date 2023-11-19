@@ -101,6 +101,13 @@ function fetchImageAsBase64(url, callback) {
         // Assuming 'targetImage.png' is in the 'images' directory of your extension
         chrome.storage.local.get('uploadedImage', function(data) {
           const sourceImageBase64 = data.uploadedImage;
+
+          // Check if the sourceImageBase64 is not set
+          if (!sourceImageBase64) {
+            alert("Please upload an image in the extension before proceeding.");
+            return; // Exit the function if no image is set
+          }
+           
           sendApiRequest(sourceImageBase64, targetImageBase64, info.srcUrl, tab, info.pageUrl);
         });
       });
