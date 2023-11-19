@@ -1,9 +1,28 @@
 let rightClickedElement = null;
 
 document.addEventListener('contextmenu', (event) => {
-  if (event.target.tagName === 'IMG') {
-    rightClickedElement = event.target;
-  }
+    // Check if the clicked element is an image
+    if (event.target.tagName === 'IMG') {
+        rightClickedElement = event.target;
+    } else {
+        // Check if the clicked element contains an image
+        const imgElement = event.target.querySelector('img');
+        if (imgElement) {
+            rightClickedElement = imgElement;
+        } else {
+            // Traverse up the DOM to find an image
+            let parent = event.target.parentElement;
+            while (parent && !rightClickedElement) {
+                if (parent.tagName === 'IMG') {
+                    rightClickedElement = parent;
+                } else if (parent.querySelector('img')) {
+                    rightClickedElement = parent.querySelector('img');
+                    break;
+                }
+                parent = parent.parentElement;
+            }
+        }
+    }
 }, true);
 
 function addStyles() {
@@ -20,38 +39,67 @@ function addStyles() {
 // Call this function early in your content script
 addStyles();
 
+function makeDraggable(element) {
+    let isDragging = false;
+    let dragStartX, dragStartY;
+
+    const onMouseDown = (e) => {
+        isDragging = true;
+        dragStartX = e.clientX - element.offsetLeft;
+        dragStartY = e.clientY - element.offsetTop;
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    };
+
+    const onMouseMove = (e) => {
+        if (!isDragging) return;
+        element.style.left = `${e.clientX - dragStartX}px`;
+        element.style.top = `${e.clientY - dragStartY}px`;
+    };
+
+    const onMouseUp = () => {
+        isDragging = false;
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    element.addEventListener('mousedown', onMouseDown);
+}
+
+
 function createPopup(imageBase64, sizeChartData, userDimensions) {
-    // Create the popup container
+    // Create the popup container with a fixed width
     const popupContainer = document.createElement('div');
     popupContainer.id = 'my-extension-image-popup';
     popupContainer.style.position = 'fixed';
     popupContainer.style.top = '50%';
     popupContainer.style.left = '50%';
     popupContainer.style.transform = 'translate(-50%, -50%)';
-    popupContainer.style.zIndex = '10000';
-    popupContainer.style.padding = '10px';
+    popupContainer.style.zIndex = '100000';
     popupContainer.style.backgroundColor = 'white';
     popupContainer.style.border = '1px solid black';
     popupContainer.style.borderRadius = '8px';
     popupContainer.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
-    popupContainer.style.display = 'flex'; // Enable flexbox
-    popupContainer.style.justifyContent = 'center'; // Center items horizontally
-    popupContainer.style.alignItems = 'center'; // Center items vertically
+    popupContainer.style.display = 'flex';
+    popupContainer.style.flexDirection = 'row';
+    popupContainer.style.alignItems = 'start';
+    popupContainer.style.padding = '10px';
+    popupContainer.style.width = '60vw'; // Fixed width
+    popupContainer.style.maxHeight = '80vh';
+    popupContainer.style.overflow = 'auto';
 
     // Create the image element
     const imageElement = document.createElement('img');
     imageElement.src = imageBase64;
-    imageElement.style.maxWidth = '40vw'; // Adjust width as needed
-    imageElement.style.maxHeight = '80vh'; // max height as 80% of the viewport height
-    imageElement.style.width = 'auto'; // maintain aspect ratio
-    imageElement.style.height = 'auto'; // maintain aspect ratio
+    imageElement.style.maxWidth = '50%'; // Adjust width as needed
+    imageElement.style.maxHeight = '100%'; 
     imageElement.style.borderRadius = '4px';
-    imageElement.style.marginRight = '20px'; // Add some space between the image and the size chart
+    imageElement.style.marginRight = '20px';
 
     // Create the size chart container
     const sizeChartContainer = document.createElement('div');
-    sizeChartContainer.style.maxWidth = '50vw'; // Adjust width as needed
-
+    sizeChartContainer.style.flexGrow = '1';
+    sizeChartContainer.style.maxWidth = '50%'; // Adjust max width as needed
 
     if (sizeChartData) {
       // Create the size chart table
@@ -111,6 +159,8 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
 
     // Append the close button to the popup
     popupContainer.appendChild(closeButton);
+
+    makeDraggable(popupContainer);
   
     // Add the popup to the body
     document.body.appendChild(popupContainer);
@@ -238,7 +288,7 @@ function createAndShowTextPopup(dataText) {
     popupContainer.style.top = '20%';
     popupContainer.style.left = '50%';
     popupContainer.style.transform = 'translateX(-50%)';
-    popupContainer.style.zIndex = '10000';  // Same z-index as the loading popup
+    popupContainer.style.zIndex = '100000';  // Same z-index as the loading popup
     popupContainer.style.padding = '20px';
     popupContainer.style.backgroundColor = 'rgba(255, 255, 255, 1)'; // Similar to loading popup
     popupContainer.style.borderRadius = '10px';
@@ -323,7 +373,7 @@ function showLoadingPopup(loadingText) {
   loadingPopup.style.top = '50%';
   loadingPopup.style.left = '50%';
   loadingPopup.style.transform = 'translate(-50%, -50%)';
-  loadingPopup.style.zIndex = '10000';
+  loadingPopup.style.zIndex = '100000';
   loadingPopup.style.padding = '20px';
   loadingPopup.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
   loadingPopup.style.borderRadius = '8px';
