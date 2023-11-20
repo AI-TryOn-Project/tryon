@@ -1,27 +1,12 @@
 let rightClickedElement = null;
+let isSelecting = false;
+let startX, startY, endX, endY;
+let overlay, selectionBox;
 
 document.addEventListener('contextmenu', (event) => {
     // Check if the clicked element is an image
     if (event.target.tagName === 'IMG') {
         rightClickedElement = event.target;
-    } else {
-        // Check if the clicked element contains an image
-        const imgElement = event.target.querySelector('img');
-        if (imgElement) {
-            rightClickedElement = imgElement;
-        } else {
-            // Traverse up the DOM to find an image
-            let parent = event.target.parentElement;
-            while (parent && !rightClickedElement) {
-                if (parent.tagName === 'IMG') {
-                    rightClickedElement = parent;
-                } else if (parent.querySelector('img')) {
-                    rightClickedElement = parent.querySelector('img');
-                    break;
-                }
-                parent = parent.parentElement;
-            }
-        }
     }
 }, true);
 
@@ -278,8 +263,50 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   } else if (message.action === 'getRecommendations') {
     showLoadingPopup('Generating AI size recommendations, Please Wait...');
     fetchRecommendations(message.userDimensions, message.base64ScreenShot);
+  } else if (message.action === "createOverlay") {
+    createOverlay();
+  } else if (message.action === "processCapturedImage") {
+    cropImage(message.dataUrl, message.selection);
   }
 });
+
+function cropImage(dataUrl, selection) {
+    const pixelRatio = window.devicePixelRatio || 1;
+    const img = new Image();
+    img.onload = function() {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = selection.width * pixelRatio;
+        canvas.height = selection.height * pixelRatio;
+        ctx.drawImage(img, 
+            selection.x * pixelRatio, 
+            selection.y * pixelRatio, 
+            selection.width * pixelRatio, 
+            selection.height * pixelRatio, 
+            0, 0, 
+            selection.width * pixelRatio, 
+            selection.height * pixelRatio
+        );
+        const croppedDataUrl = canvas.toDataURL('image/png');
+        chrome.runtime.sendMessage({ action: "finishedCrop", croppedDataUrl: croppedDataUrl });
+    };
+    img.src = dataUrl;
+}
+
+// function cropImage(dataUrl, selection) {
+//     const img = new Image();
+//     img.onload = function() {
+//         const canvas = document.createElement('canvas');
+//         const ctx = canvas.getContext('2d');
+//         canvas.width = selection.width;
+//         canvas.height = selection.height;
+//         ctx.drawImage(img, selection.x, selection.y, selection.width, selection.height, 0, 0, selection.width, selection.height);
+//         const croppedDataUrl = canvas.toDataURL('image/png');
+//         // console.log(croppedDataUrl); // Further processing here
+//         chrome.runtime.sendMessage({ action: "finishedCrop", croppedDataUrl: croppedDataUrl });
+//     };
+//     img.src = dataUrl;
+// }
 
 function fetchRecommendations(bodyMeasurements, base64ScreenShot) {
     const apiUrl = 'https://api.tianlong.co.uk/get-size-recommendation';
@@ -445,4 +472,73 @@ function hideLoadingPopup() {
   if (loadingPopup) {
       document.body.removeChild(loadingPopup);
   }
+}
+
+function createOverlay() {
+    console.log("creating overlay")
+    selectionBox = null;
+    isSelecting = true;
+    overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100vw';
+    overlay.style.height = '100vh';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    overlay.style.cursor = 'crosshair';
+    overlay.style.zIndex = '9999';
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('mousedown', startSelection);
+    overlay.addEventListener('mousemove', resizeSelection);
+    overlay.addEventListener('mouseup', endSelection);
+}
+
+function startSelection(event) {
+    startX = event.clientX;
+    startY = event.clientY;
+    selectionBox = document.createElement('div');
+    selectionBox.style.position = 'absolute';
+    selectionBox.style.border = '2px solid red';
+    selectionBox.style.left = `${startX}px`;
+    selectionBox.style.top = `${startY}px`;
+    overlay.appendChild(selectionBox);
+}
+
+function resizeSelection(event) {
+    if (!selectionBox) return;
+
+    endX = event.clientX;
+    endY = event.clientY;
+    const width = Math.abs(endX - startX);
+    const height = Math.abs(endY - startY);
+    const left = Math.min(endX, startX);
+    const top = Math.min(endY, startY);
+
+    selectionBox.style.width = `${width}px`;
+    selectionBox.style.height = `${height}px`;
+    selectionBox.style.left = `${left}px`;
+    selectionBox.style.top = `${top}px`;
+}
+
+function endSelection() {
+    if (selectionBox) {
+        overlay.removeEventListener('mousedown', startSelection);
+        overlay.removeEventListener('mousemove', resizeSelection);
+        overlay.removeEventListener('mouseup', endSelection);
+        
+        const selectionCoordinates = {
+            x: parseInt(selectionBox.style.left, 10),
+            y: parseInt(selectionBox.style.top, 10),
+            width: parseInt(selectionBox.style.width, 10),
+            height: parseInt(selectionBox.style.height, 10)
+        };
+        
+        // Send coordinates to background script
+        chrome.runtime.sendMessage({ action: "captureSelectedArea", coordinates: selectionCoordinates });
+
+        // Clean up
+        overlay.remove();
+        isSelecting = false;
+    }
 }

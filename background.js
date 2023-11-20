@@ -2,7 +2,7 @@ chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
       id: "viewImage",
       title: "fAIshion Try-On",
-      contexts: ["image"]
+      contexts: ["all"]
     });
   });
 
@@ -24,8 +24,28 @@ chrome.runtime.onInstalled.addListener(() => {
           }
         });
       });
+    } else if (message.action === 'captureSelectedArea') {
+      captureAndProcessImage(message.coordinates);
+    } else if (message.action === 'finishedCrop') {
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        const currentTab = tabs[0];
+        generateTryOn(message.croppedDataUrl, "https://img.shopcider.com/hermes/video/1681719531000-ehkmff.jpg", currentTab, "https://www.shopcider.com/product/detail?pid=1012906&style_id=112905") // fix me
+      });
     }
   });
+
+function captureAndProcessImage(selectionCoordinates) {
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    const currentTab = tabs[0];
+    chrome.tabs.captureVisibleTab(currentTab.windowId, {format: 'png'}, function(dataUrl) {
+        chrome.tabs.sendMessage(currentTab.id, { 
+          action: "processCapturedImage", 
+          dataUrl: dataUrl, 
+          selection: selectionCoordinates 
+      });
+    });
+  });
+}
 
 // Fetches an image and converts it to a base64 data URL
 function fetchImageAsBase64(url, callback) {
@@ -85,21 +105,30 @@ function fetchImageAsBase64(url, callback) {
   // Example usage: Convert right-clicked image to base64 and call API
   chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === "viewImage") {
-        fetchImageAsBase64(info.srcUrl, (targetImageBase64) => {
-        // Assuming 'targetImage.png' is in the 'images' directory of your extension
-        chrome.storage.local.get(['uploadedImage', 'lowRes'], function(data) {
-          const sourceImageBase64 = data.uploadedImage;
-          const useLowRes = data.lowRes || false; // Default to false if not set
-
-          // Check if the sourceImageBase64 is not set
-          if (!sourceImageBase64) {
-            alert("Please upload an image in the extension before proceeding.");
-            return; // Exit the function if no image is set
-          }
-           
-          sendApiRequest(sourceImageBase64, targetImageBase64, info.srcUrl, tab, info.pageUrl, useLowRes);
-        });
-      });
+        if(info.srcUrl) {
+          fetchImageAsBase64(info.srcUrl, (targetImageBase64) => {
+            generateTryOn(targetImageBase64, info.srcUrl, tab, info.pageUrl)
+          });
+        } else {
+          console.log("no src url, sending createOverlay message to content script")
+          chrome.tabs.sendMessage(tab.id, { action: "createOverlay" });
+        }
     }
   });
+
+  function generateTryOn(targetImageBase64, srcUrl, tab, pageUrl) {
+    // Assuming 'targetImage.png' is in the 'images' directory of your extension
+    chrome.storage.local.get(['uploadedImage', 'lowRes'], function(data) {
+      const sourceImageBase64 = data.uploadedImage;
+      const useLowRes = data.lowRes || false; // Default to false if not set
+
+      // Check if the sourceImageBase64 is not set
+      if (!sourceImageBase64) {
+        alert("Please upload an image in the extension before proceeding.");
+        return; // Exit the function if no image is set
+      }
+       
+      sendApiRequest(sourceImageBase64, targetImageBase64, srcUrl, tab, pageUrl, useLowRes);
+    });
+  }
   
