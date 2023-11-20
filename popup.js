@@ -7,6 +7,19 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('hipsInput').value = result.bodyDimensions.hips || '';
         }
     });
+
+    // Load the current state of the 'lowResCheckbox' and set it
+    chrome.storage.local.get('lowRes', function(data) {
+        const lowResCheckbox = document.getElementById('lowResCheckbox');
+        if (data.lowRes !== undefined) {
+            lowResCheckbox.checked = data.lowRes;
+        }
+    });
+
+    // Add change event listener to the checkbox
+    lowResCheckbox.addEventListener('change', function() {
+        chrome.storage.local.set({ 'lowRes': this.checked });
+    });
 });
 
 // Save new values
@@ -33,9 +46,6 @@ document.getElementById('saveDimensionsBtn').addEventListener('click', function(
     });
 });
 
-document.getElementById('lowResCheckbox').addEventListener('change', function() {
-    chrome.storage.local.set({ 'lowRes': this.checked });
-});
 
 document.getElementById('screenshotButton').addEventListener('click', function() {
     chrome.runtime.sendMessage({action: 'capture'});
