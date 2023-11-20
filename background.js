@@ -40,7 +40,7 @@ function fetchImageAsBase64(url, callback) {
   }
   
   // This function sends the API request to your server
-  function sendApiRequest(sourceImageBase64, targetImageBase64, lastRightClickedImageSrc, tab, pageUrl) {
+  function sendApiRequest(sourceImageBase64, targetImageBase64, lastRightClickedImageSrc, tab, pageUrl, useLowRes) {
     chrome.tabs.sendMessage(tab.id, {
       action: 'showLoading'
     });
@@ -48,22 +48,10 @@ function fetchImageAsBase64(url, callback) {
     const data = {
         "source_image": sourceImageBase64,
         "target_image": targetImageBase64,
-        "source_faces_index": [0],
-        "face_index": [0],
-        "upscaler": "4x_Struzan_300000",
-        "scale": 2,
-        "upscale_visibility": 1,
-        "face_restorer": "CodeFormer",
-        "restorer_visibility": 1,
-        "restore_first": 1,
-        "model": "inswapper_128.onnx",
-        "gender_source": 0,
-        "gender_target": 0,
-        "save_to_file": 0,
-        "result_file_path": ""
+        "upscale": !useLowRes
     };
   
-    fetch('https://f0c72922396e-11790734418303044228.ngrok-free.app/reactor/image', {
+    fetch('https://tianlong.ngrok.io/relay', {
       method: 'POST',
       headers: {
         'accept': 'application/json',
@@ -99,8 +87,9 @@ function fetchImageAsBase64(url, callback) {
     if (info.menuItemId === "viewImage") {
         fetchImageAsBase64(info.srcUrl, (targetImageBase64) => {
         // Assuming 'targetImage.png' is in the 'images' directory of your extension
-        chrome.storage.local.get('uploadedImage', function(data) {
+        chrome.storage.local.get(['uploadedImage', 'lowRes'], function(data) {
           const sourceImageBase64 = data.uploadedImage;
+          const useLowRes = data.lowRes || false; // Default to false if not set
 
           // Check if the sourceImageBase64 is not set
           if (!sourceImageBase64) {
@@ -108,7 +97,7 @@ function fetchImageAsBase64(url, callback) {
             return; // Exit the function if no image is set
           }
            
-          sendApiRequest(sourceImageBase64, targetImageBase64, info.srcUrl, tab, info.pageUrl);
+          sendApiRequest(sourceImageBase64, targetImageBase64, info.srcUrl, tab, info.pageUrl, useLowRes);
         });
       });
     }

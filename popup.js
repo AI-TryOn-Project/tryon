@@ -33,6 +33,10 @@ document.getElementById('saveDimensionsBtn').addEventListener('click', function(
     });
 });
 
+document.getElementById('lowResCheckbox').addEventListener('change', function() {
+    chrome.storage.local.set({ 'lowRes': this.checked });
+});
+
 document.getElementById('screenshotButton').addEventListener('click', function() {
     chrome.runtime.sendMessage({action: 'capture'});
   });
