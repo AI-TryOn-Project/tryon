@@ -475,9 +475,10 @@ function hideLoadingPopup() {
 }
 
 function createOverlay() {
-    console.log("creating overlay")
+    console.log("creating overlay");
     selectionBox = null;
     isSelecting = true;
+
     overlay = document.createElement('div');
     overlay.style.position = 'fixed';
     overlay.style.top = '0';
@@ -487,12 +488,14 @@ function createOverlay() {
     overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
     overlay.style.cursor = 'crosshair';
     overlay.style.zIndex = '9999';
+    overlay.style.clipPath = 'inset(0)'; // Initially no clipping
     document.body.appendChild(overlay);
 
     overlay.addEventListener('mousedown', startSelection);
     overlay.addEventListener('mousemove', resizeSelection);
     overlay.addEventListener('mouseup', endSelection);
 }
+
 
 function startSelection(event) {
     startX = event.clientX;
@@ -510,16 +513,35 @@ function resizeSelection(event) {
 
     endX = event.clientX;
     endY = event.clientY;
+
     const width = Math.abs(endX - startX);
     const height = Math.abs(endY - startY);
-    const left = Math.min(endX, startX);
-    const top = Math.min(endY, startY);
+
+    const top = Math.min(startY, endY);
+    const right = Math.max(startX, endX);
+    const bottom = Math.max(startY, endY);
+    const left = Math.min(startX, endX);
 
     selectionBox.style.width = `${width}px`;
     selectionBox.style.height = `${height}px`;
     selectionBox.style.left = `${left}px`;
     selectionBox.style.top = `${top}px`;
+
+    // Calculate the clip-path
+    overlay.style.clipPath = `polygon(
+        0% 0%,
+        0% 100%,
+        ${left}px 100%,
+        ${left}px ${top}px,
+        ${right}px ${top}px,
+        ${right}px ${bottom}px,
+        ${left}px ${bottom}px,
+        ${left}px 100%,
+        100% 100%,
+        100% 0%
+    )`;
 }
+
 
 function endSelection() {
     if (selectionBox) {
