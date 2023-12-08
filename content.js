@@ -494,6 +494,16 @@ function createOverlay() {
     overlay.addEventListener('mousedown', startSelection);
     overlay.addEventListener('mousemove', resizeSelection);
     overlay.addEventListener('mouseup', endSelection);
+    document.addEventListener('keydown', cancelSelection); // Add keydown listener
+}
+
+function cancelSelection(event) {
+    if (event.key === "Escape") {
+        overlay.remove();
+        isSelecting = false;
+        selectionBox = null;
+        document.removeEventListener('keydown', cancelSelection); // Remove the listener
+    }
 }
 
 

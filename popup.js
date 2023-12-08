@@ -20,6 +20,15 @@ document.addEventListener('DOMContentLoaded', function() {
     lowResCheckbox.addEventListener('change', function() {
         chrome.storage.local.set({ 'lowRes': this.checked });
     });
+
+    // Load and display the stored image if it exists
+    chrome.storage.local.get('uploadedImage', function(data) {
+        if (data.uploadedImage) {
+            const imagePreview = document.getElementById('imagePreview');
+            imagePreview.src = 'data:image/png;base64,' + data.uploadedImage;
+            imagePreview.classList.remove('hidden'); // Show the image preview
+        }
+    });
 });
 
 // Save new values
@@ -51,7 +60,7 @@ document.getElementById('screenshotButton').addEventListener('click', function()
     chrome.runtime.sendMessage({action: 'capture'});
   });
 
-document.getElementById('uploadBtn').addEventListener('click', function() {
+  document.getElementById('uploadBtn').addEventListener('click', function() {
     const fileInput = document.getElementById('imageUpload');
     const file = fileInput.files[0];
 
@@ -61,12 +70,15 @@ document.getElementById('uploadBtn').addEventListener('click', function() {
     }
 
     const reader = new FileReader();
+    const preview = document.getElementById('imagePreview');
 
     reader.onloadend = function() {
-        const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
+        const base64String = reader.result;
+        preview.src = base64String;
+        preview.classList.remove('hidden'); // Show the image preview
 
         // Store the base64 image in local storage
-        chrome.storage.local.set({ 'uploadedImage': base64String }, function() {
+        chrome.storage.local.set({ 'uploadedImage': base64String.replace('data:', '').replace(/^.+,/, '') }, function() {
             if (chrome.runtime.lastError) {
                 alert('An error occurred: ' + chrome.runtime.lastError.message);
             } else {
