@@ -3,6 +3,17 @@ let isSelecting = false;
 let startX, startY, endX, endY;
 let overlay, selectionBox;
 
+const loadTailwind = () => {
+    const link = document.createElement('link');
+    link.href = 'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css';
+    link.type = 'text/css';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+};
+
+// Call the function to load Tailwind CSS
+loadTailwind();
+
 document.addEventListener('contextmenu', (event) => {
     // Check if the clicked element is an image
     if (event.target.tagName === 'IMG') {
@@ -14,10 +25,14 @@ function addStyles() {
   const styleElement = document.createElement('style');
   styleElement.type = 'text/css';
   styleElement.textContent = `
-      .highlight {
-          background-color: yellow;
-      }
-  `;
+    .highlight {
+        background-color: #fff3cd; /* softer yellow */
+        border: 1px solid #ffeeba;
+        color: #856404; /* darker text color for better contrast */
+        padding: 5px;
+        border-radius: 4px; /* rounded corners */
+    }
+    `;
   document.head.appendChild(styleElement);
 }
 
@@ -53,38 +68,23 @@ function makeDraggable(element) {
 
 
 function createPopup(imageBase64, sizeChartData, userDimensions) {
-    // Create the popup container with a fixed width
+    // Create the popup container with a larger width and flex row layout
+    // Create the popup container with Tailwind classes and proper centering
     const popupContainer = document.createElement('div');
     popupContainer.id = 'my-extension-image-popup';
-    popupContainer.style.position = 'fixed';
+    popupContainer.className = 'fixed inset-0 z-50 bg-white border border-black rounded-lg shadow-lg p-4 w-5/6 max-h-3/4 m-auto overflow-auto flex flex-row';
     popupContainer.style.top = '50%';
     popupContainer.style.left = '50%';
     popupContainer.style.transform = 'translate(-50%, -50%)';
-    popupContainer.style.zIndex = '100000';
-    popupContainer.style.backgroundColor = 'white';
-    popupContainer.style.border = '1px solid black';
-    popupContainer.style.borderRadius = '8px';
-    popupContainer.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
-    popupContainer.style.display = 'flex';
-    popupContainer.style.flexDirection = 'row';
-    popupContainer.style.alignItems = 'start';
-    popupContainer.style.padding = '10px';
-    popupContainer.style.width = '60vw'; // Fixed width
-    popupContainer.style.maxHeight = '80vh';
-    popupContainer.style.overflow = 'auto';
 
-    // Create the image element
+    // Create the image element with a limited width
     const imageElement = document.createElement('img');
     imageElement.src = imageBase64;
-    imageElement.style.maxWidth = '50%'; // Adjust width as needed
-    imageElement.style.maxHeight = '100%'; 
-    imageElement.style.borderRadius = '4px';
-    imageElement.style.marginRight = '20px';
+    imageElement.className = 'w-1/3 max-h-full rounded-lg mr-4 object-contain'; // Limit width to 1/3
 
-    // Create the size chart container
+    // Create the size chart container with a controlled width
     const sizeChartContainer = document.createElement('div');
-    sizeChartContainer.style.flexGrow = '1';
-    sizeChartContainer.style.maxWidth = '50%'; // Adjust max width as needed
+    sizeChartContainer.className = 'w-2/3';
 
     if (sizeChartData) {
         // Create the size chart table
@@ -144,12 +144,10 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
     // Create a close button
     const closeButton = document.createElement('button');
     closeButton.textContent = 'Close';
+    closeButton.className = 'absolute bottom-4 right-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded';
     closeButton.onclick = function() {
         document.body.removeChild(popupContainer);
     };
-    closeButton.style.position = 'absolute';
-    closeButton.style.bottom = '10px';
-    closeButton.style.right = '10px';
 
     // Append the close button to the popup
     popupContainer.appendChild(closeButton);
