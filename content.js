@@ -72,7 +72,7 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
     // Create the popup container with Tailwind classes and proper centering
     const popupContainer = document.createElement('div');
     popupContainer.id = 'my-extension-image-popup';
-    popupContainer.className = 'fixed inset-0 z-50 bg-white border border-black rounded-lg shadow-lg p-4 w-5/6 max-h-3/4 m-auto overflow-auto flex flex-row';
+    popupContainer.className = 'fixed inset-0 z-50 bg-white border border-black rounded-lg shadow-lg p-4 max-h-3/4 m-auto overflow-auto flex flex-row';
     popupContainer.style.top = '50%';
     popupContainer.style.left = '50%';
     popupContainer.style.transform = 'translate(-50%, -50%)';
@@ -80,13 +80,15 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
     // Create the image element with a limited width
     const imageElement = document.createElement('img');
     imageElement.src = imageBase64;
-    imageElement.className = 'w-1/3 max-h-full rounded-lg mr-4 object-contain'; // Limit width to 1/3
+    imageElement.className = 'max-h-full rounded-lg mr-4 object-contain';
 
     // Create the size chart container with a controlled width
     const sizeChartContainer = document.createElement('div');
     sizeChartContainer.className = 'w-2/3';
 
     if (sizeChartData) {
+        imageElement.className += ' w-1/3'; // Image takes up 1/3 of the width
+        sizeChartContainer.className = 'w-2/3'; // Size chart takes up 2/3 of the width
         // Create the size chart table
         const sizeChartTable = document.createElement('table');
         sizeChartTable.id = 'sizeChartTable';
@@ -131,10 +133,15 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
         message.textContent = "Inaccurate or outdated size chart? Use our plugin to take the current size chart and see our size recommendation.";
         sizeChartContainer.appendChild(message);
     } else {
-      // Fallback message when size chart is not available
-      const fallbackMessage = document.createElement('p');
-      fallbackMessage.textContent = "We don't have a size chart for this apparel on file. Try taking a screenshot of the size chart and see our size recommendation.";
-      sizeChartContainer.appendChild(fallbackMessage);
+        popupContainer.className = 'fixed inset-0 z-50 bg-white border border-black rounded-lg shadow-lg p-4 w-1/3 max-h-3/4 m-auto overflow-auto flex flex-row';
+
+        imageElement.className += ' w-full'; // Image takes up full width of the narrowed container
+        sizeChartContainer.className = 'hidden'; // Hide size chart container
+
+        // Fallback message when size chart is not available
+        const fallbackMessage = document.createElement('p');
+        fallbackMessage.textContent = "We don't have a size chart for this apparel on file. Try taking a screenshot of the size chart and see our size recommendation.";
+        sizeChartContainer.appendChild(fallbackMessage);
     }
     // Append the image and close button to the popup
     popupContainer.appendChild(imageElement);
@@ -370,6 +377,8 @@ function createAndShowTextPopup(dataText) {
 
     // Append the close button to the popup container
     popupContainer.appendChild(closeButton);
+
+    makeDraggable(popupContainer);
 
     // Append the popup container to the body
     document.body.appendChild(popupContainer);
