@@ -348,7 +348,7 @@ function createAndShowTextPopup(dataText) {
     popupContainer.style.top = '20%';
     popupContainer.style.left = '50%';
     popupContainer.style.transform = 'translateX(-50%)';
-    popupContainer.style.zIndex = '100000';  // Same z-index as the loading popup
+    popupContainer.style.zIndex = '1000000';  // Same z-index as the loading popup
     popupContainer.style.padding = '20px';
     popupContainer.style.backgroundColor = 'rgba(255, 255, 255, 1)'; // Similar to loading popup
     popupContainer.style.borderRadius = '10px';
@@ -435,7 +435,7 @@ function showLoadingPopup(loadingText) {
   loadingPopup.style.top = '50%';
   loadingPopup.style.left = '50%';
   loadingPopup.style.transform = 'translate(-50%, -50%)';
-  loadingPopup.style.zIndex = '100000';
+  loadingPopup.style.zIndex = '1000000';
   loadingPopup.style.padding = '20px';
   loadingPopup.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
   loadingPopup.style.borderRadius = '8px';
