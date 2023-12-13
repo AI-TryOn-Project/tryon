@@ -8,6 +8,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    document.getElementById('toggleImagePreviewBtn').addEventListener('click', function() {
+        var imgPreview = document.getElementById('imagePreview');
+        if (imgPreview.style.display === "none") {
+            imgPreview.style.display = "block";
+        } else {
+            imgPreview.style.display = "none";
+        }
+    });
+
     // Load the current state of the 'lowResCheckbox' and set it
     chrome.storage.local.get('lowRes', function(data) {
         const lowResCheckbox = document.getElementById('lowResCheckbox');

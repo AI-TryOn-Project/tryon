@@ -3,39 +3,44 @@
 <head>
     <title>Upload Image</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .text-xxs {
+            font-size: 0.7rem; /* Custom smaller font size */
+        }
+    </style>
 </head>
-<body class="bg-gray-100 p-4 w-full max-w-lg mx-auto">
-   
-    <div class="flex items-center mb-3">
-        <label for="bustInput" class="text-gray-700 text-sm font-bold mr-2">Bust (inches):</label>
-        <input type="number" id="bustInput" placeholder="Bust (inches)" class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline flex-grow">
+<body class="bg-gray-100 p-2 w-full max-w-lg mx-auto">
+
+    <div class="flex items-center mb-1">
+        <label for="bustInput" class="text-gray-700 text-xxs font-bold mr-1">Bust(in.)</label>
+        <input type="number" id="bustInput" placeholder="Bust (inches)" class="shadow appearance-none border rounded p-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline flex-grow text-xxs">
     </div>
     
-    <div class="flex items-center mb-3">
-        <label for="waistInput" class="text-gray-700 text-sm font-bold mr-2">Waist (inches):</label>
-        <input type="number" id="waistInput" placeholder="Waist (inches)" class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline flex-grow">
+    <div class="flex items-center mb-1">
+        <label for="waistInput" class="text-gray-700 text-xxs font-bold mr-1">Waist(in.)</label>
+        <input type="number" id="waistInput" placeholder="Waist (inches)" class="shadow appearance-none border rounded p-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline flex-grow text-xxs">
     </div>
     
-    <div class="flex items-center mb-3">
-        <label for="hipsInput" class="text-gray-700 text-sm font-bold mr-2">Hips (inches):</label>
-        <input type="number" id="hipsInput" placeholder="Hips (inches)" class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline flex-grow">
+    <div class="flex items-center mb-1">
+        <label for="hipsInput" class="text-gray-700 text-xxs font-bold mr-1">Hips(in.)</label>
+        <input type="number" id="hipsInput" placeholder="Hips (inches)" class="shadow appearance-none border rounded p-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline flex-grow text-xxs">
     </div>
-    
 
-    <button id="saveDimensionsBtn" class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-4">Save Dimensions</button>
+    <button id="saveDimensionsBtn" class="w-full bg-green-500 hover:bg-green-700 text-white font-bold p-1 rounded mb-1 text-xxs">Save Dimensions</button>
 
-    <button id="screenshotButton" class="w-full bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded mb-4">Take Screenshot to get Size Recommendation</button>
+    <button id="screenshotButton" class="w-full bg-indigo-500 hover:bg-indigo-700 text-white font-bold p-1 rounded mb-1 text-xxs">Size Recommendation</button>
 
-    <div class="flex items-center mb-4">
-        <input type="file" id="imageUpload" accept="image/*" class="text-sm p-2 border border-gray-300 rounded-md w-3/4 mr-2">
-        <button id="uploadBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Upload</button>
+    <div class="flex items-center mb-1">
+        <input type="file" id="imageUpload" accept="image/*" class="text-xxs p-1 border border-gray-300 rounded w-3/4 mr-1">
+        <button id="uploadBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 rounded text-xxs">Upload</button>
     </div>
-    
 
-    <img id="imagePreview" src="" class="w-full mb-4 hidden" alt="Image preview">
+    <button id="toggleImagePreviewBtn" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 rounded mb-1 text-xxs">Toggle Image Preview</button>
 
-    <label for="lowResCheckbox" class="inline-flex items-center mt-3">
-        <input type="checkbox" id="lowResCheckbox" class="form-checkbox h-5 w-5 text-gray-600"><span class="ml-2 text-gray-700 text-sm">Low Resolution</span>
+    <img id="imagePreview" src="" class="w-full mb-1 hidden" alt="Image preview" style="display: none;"> <!-- Ensure display is set to none -->
+
+    <label for="lowResCheckbox" class="inline-flex items-center mt-1">
+        <input type="checkbox" id="lowResCheckbox" class="form-checkbox h-4 w-4 text-gray-600"><span class="ml-1 text-gray-700 text-xxs">Low Resolution</span>
     </label>
     
     <script src="popup.js"></script>
