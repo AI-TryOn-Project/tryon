@@ -25,14 +25,14 @@ function addStyles() {
   const styleElement = document.createElement('style');
   styleElement.type = 'text/css';
   styleElement.textContent = `
-    .highlight {
+      .highlight {
         background-color: #fff3cd; /* softer yellow */
         border: 1px solid #ffeeba;
         color: #856404; /* darker text color for better contrast */
         padding: 5px;
         border-radius: 4px; /* rounded corners */
-    }
-    `;
+      }
+  `;
   document.head.appendChild(styleElement);
 }
 
@@ -68,27 +68,40 @@ function makeDraggable(element) {
 
 
 function createPopup(imageBase64, sizeChartData, userDimensions) {
-    // Create the popup container with a larger width and flex row layout
-    // Create the popup container with Tailwind classes and proper centering
+    // Create the popup container with a fixed width
     const popupContainer = document.createElement('div');
     popupContainer.id = 'my-extension-image-popup';
-    popupContainer.className = 'fixed inset-0 z-50 bg-white border border-black rounded-lg shadow-lg p-4 max-h-3/4 m-auto overflow-auto flex flex-row';
+    popupContainer.style.position = 'fixed';
     popupContainer.style.top = '50%';
     popupContainer.style.left = '50%';
     popupContainer.style.transform = 'translate(-50%, -50%)';
+    popupContainer.style.zIndex = '100000';
+    popupContainer.style.backgroundColor = 'white';
+    popupContainer.style.border = '1px solid black';
+    popupContainer.style.borderRadius = '8px';
+    popupContainer.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+    popupContainer.style.display = 'flex';
+    popupContainer.style.flexDirection = 'row';
+    popupContainer.style.alignItems = 'start';
+    popupContainer.style.padding = '10px';
+    popupContainer.style.width = '60vw'; // Fixed width
+    popupContainer.style.maxHeight = '80vh';
+    popupContainer.style.overflow = 'auto';
 
-    // Create the image element with a limited width
+    // Create the image element
     const imageElement = document.createElement('img');
     imageElement.src = imageBase64;
-    imageElement.className = 'max-h-full rounded-lg mr-4 object-contain';
+    imageElement.style.maxWidth = '50%'; // Adjust width as needed
+    imageElement.style.maxHeight = '100%'; 
+    imageElement.style.borderRadius = '4px';
+    imageElement.style.marginRight = '20px';
 
-    // Create the size chart container with a controlled width
+    // Create the size chart container
     const sizeChartContainer = document.createElement('div');
-    sizeChartContainer.className = 'w-2/3';
+    sizeChartContainer.style.flexGrow = '1';
+    sizeChartContainer.style.maxWidth = '50%'; // Adjust max width as needed
 
     if (sizeChartData) {
-        imageElement.className += ' w-1/3'; // Image takes up 1/3 of the width
-        sizeChartContainer.className = 'w-2/3'; // Size chart takes up 2/3 of the width
         // Create the size chart table
         const sizeChartTable = document.createElement('table');
         sizeChartTable.id = 'sizeChartTable';
@@ -133,11 +146,7 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
         message.textContent = "Inaccurate or outdated size chart? Use our plugin to take the current size chart and see our size recommendation.";
         sizeChartContainer.appendChild(message);
     } else {
-        popupContainer.className = 'fixed inset-0 z-50 bg-white border border-black rounded-lg shadow-lg p-4 w-1/3 max-h-3/4 m-auto overflow-auto flex flex-row';
-
-        imageElement.className += ' w-full'; // Image takes up full width of the narrowed container
-        sizeChartContainer.className = 'hidden'; // Hide size chart container
-
+        
         // Fallback message when size chart is not available
         const fallbackMessage = document.createElement('p');
         fallbackMessage.textContent = "We don't have a size chart for this apparel on file. Try taking a screenshot of the size chart and see our size recommendation.";
@@ -151,10 +160,12 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
     // Create a close button
     const closeButton = document.createElement('button');
     closeButton.textContent = 'Close';
-    closeButton.className = 'absolute bottom-4 right-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded';
     closeButton.onclick = function() {
         document.body.removeChild(popupContainer);
     };
+    closeButton.style.position = 'absolute';
+    closeButton.style.bottom = '10px';
+    closeButton.style.right = '10px';
 
     // Append the close button to the popup
     popupContainer.appendChild(closeButton);
@@ -348,7 +359,7 @@ function createAndShowTextPopup(dataText) {
     popupContainer.style.top = '20%';
     popupContainer.style.left = '50%';
     popupContainer.style.transform = 'translateX(-50%)';
-    popupContainer.style.zIndex = '1000000';  // Same z-index as the loading popup
+    popupContainer.style.zIndex = '100000';  // Same z-index as the loading popup
     popupContainer.style.padding = '20px';
     popupContainer.style.backgroundColor = 'rgba(255, 255, 255, 1)'; // Similar to loading popup
     popupContainer.style.borderRadius = '10px';
@@ -377,8 +388,6 @@ function createAndShowTextPopup(dataText) {
 
     // Append the close button to the popup container
     popupContainer.appendChild(closeButton);
-
-    makeDraggable(popupContainer);
 
     // Append the popup container to the body
     document.body.appendChild(popupContainer);
@@ -435,7 +444,7 @@ function showLoadingPopup(loadingText) {
   loadingPopup.style.top = '50%';
   loadingPopup.style.left = '50%';
   loadingPopup.style.transform = 'translate(-50%, -50%)';
-  loadingPopup.style.zIndex = '1000000';
+  loadingPopup.style.zIndex = '100000';
   loadingPopup.style.padding = '20px';
   loadingPopup.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
   loadingPopup.style.borderRadius = '8px';
