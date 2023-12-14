@@ -84,7 +84,7 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
     popupContainer.style.flexDirection = 'row';
     popupContainer.style.alignItems = 'start';
     popupContainer.style.padding = '10px';
-    popupContainer.style.width = '60vw'; // Fixed width
+    popupContainer.style.width = sizeChartData ? '60vw' : '30vw'; // Adjust width as needed
     popupContainer.style.maxHeight = '80vh';
     popupContainer.style.overflow = 'auto';
 
@@ -98,8 +98,8 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
 
     // Create the size chart container
     const sizeChartContainer = document.createElement('div');
-    sizeChartContainer.style.flexGrow = '1';
-    sizeChartContainer.style.maxWidth = '50%'; // Adjust max width as needed
+    sizeChartContainer.style.flexGrow = sizeChartData ? '1' : '0'; // Adjust based on sizeChartData
+    sizeChartContainer.style.maxWidth = sizeChartData ? '50%' : '0'; // Adjust max width based on sizeChartData
 
     if (sizeChartData) {
         // Create the size chart table
@@ -150,7 +150,8 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
         // Fallback message when size chart is not available
         const fallbackMessage = document.createElement('p');
         fallbackMessage.textContent = "We don't have a size chart for this apparel on file. Try taking a screenshot of the size chart and see our size recommendation.";
-        sizeChartContainer.appendChild(fallbackMessage);
+        //sizeChartContainer.appendChild(fallbackMessage);
+        imageElement.style.maxWidth = '100%'; // Use more space for the image when there is no size chart
     }
     // Append the image and close button to the popup
     popupContainer.appendChild(imageElement);
