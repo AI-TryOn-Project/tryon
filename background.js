@@ -71,7 +71,7 @@ function fetchImageAsBase64(url, callback) {
         "upscale": !useLowRes
     };
   
-    fetch('https://tianlong.ngrok.io/relay', {
+    fetch('https://tryon.tianlong.co.uk/relay', {
       method: 'POST',
       headers: {
         'accept': 'application/json',
