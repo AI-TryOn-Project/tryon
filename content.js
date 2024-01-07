@@ -3,16 +3,7 @@ let isSelecting = false;
 let startX, startY, endX, endY;
 let overlay, selectionBox;
 
-const loadTailwind = () => {
-    const link = document.createElement('link');
-    link.href = 'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css';
-    link.type = 'text/css';
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
-};
 
-// Call the function to load Tailwind CSS
-loadTailwind();
 
 document.addEventListener('contextmenu', (event) => {
     // Check if the clicked element is an image
@@ -309,21 +300,6 @@ function cropImage(dataUrl, selection) {
     };
     img.src = dataUrl;
 }
-
-// function cropImage(dataUrl, selection) {
-//     const img = new Image();
-//     img.onload = function() {
-//         const canvas = document.createElement('canvas');
-//         const ctx = canvas.getContext('2d');
-//         canvas.width = selection.width;
-//         canvas.height = selection.height;
-//         ctx.drawImage(img, selection.x, selection.y, selection.width, selection.height, 0, 0, selection.width, selection.height);
-//         const croppedDataUrl = canvas.toDataURL('image/png');
-//         // console.log(croppedDataUrl); // Further processing here
-//         chrome.runtime.sendMessage({ action: "finishedCrop", croppedDataUrl: croppedDataUrl });
-//     };
-//     img.src = dataUrl;
-// }
 
 function fetchRecommendations(bodyMeasurements, base64ScreenShot) {
     const apiUrl = 'https://api.tianlong.co.uk/get-size-recommendation';
