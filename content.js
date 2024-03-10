@@ -3,8 +3,6 @@ let isSelecting = false;
 let startX, startY, endX, endY;
 let overlay, selectionBox;
 
-
-
 document.addEventListener('contextmenu', (event) => {
     // Check if the clicked element is an image
     if (event.target.tagName === 'IMG') {
@@ -13,9 +11,9 @@ document.addEventListener('contextmenu', (event) => {
 }, true);
 
 function addStyles() {
-  const styleElement = document.createElement('style');
-  styleElement.type = 'text/css';
-  styleElement.textContent = `
+    const styleElement = document.createElement('style');
+    styleElement.type = 'text/css';
+    styleElement.textContent = `
       .highlight {
         background-color: #fff3cd; /* softer yellow */
         border: 1px solid #ffeeba;
@@ -24,7 +22,7 @@ function addStyles() {
         border-radius: 4px; /* rounded corners */
       }
   `;
-  document.head.appendChild(styleElement);
+    document.head.appendChild(styleElement);
 }
 
 // Call this function early in your content script
@@ -83,7 +81,7 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
     const imageElement = document.createElement('img');
     imageElement.src = imageBase64;
     imageElement.style.maxWidth = '50%'; // Adjust width as needed
-    imageElement.style.maxHeight = '100%'; 
+    imageElement.style.maxHeight = '100%';
     imageElement.style.borderRadius = '4px';
     imageElement.style.marginRight = '20px';
 
@@ -98,13 +96,13 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
         sizeChartTable.id = 'sizeChartTable';
         sizeChartTable.style.width = '100%';
         sizeChartTable.style.borderCollapse = 'collapse';
-    
+
         // Function to reorder keys with 'Size' as the first key
         const reorderKeysWithSizeFirst = (obj) => {
             const { Size, ...rest } = obj;
             return { Size, ...rest };
         };
-    
+
         // Add headers to the table
         const headerRow = document.createElement('tr');
         const orderedKeys = Object.keys(reorderKeysWithSizeFirst(sizeChartData[0]));
@@ -116,7 +114,7 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
             headerRow.appendChild(headerCell);
         });
         sizeChartTable.appendChild(headerRow);
-    
+
         // Add data to the table
         sizeChartData.forEach(item => {
             const dataRow = document.createElement('tr');
@@ -130,14 +128,14 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
             });
             sizeChartTable.appendChild(dataRow);
         });
-    
+
         // Append the size chart table to its container
         sizeChartContainer.appendChild(sizeChartTable);
         const message = document.createElement('p');
         message.textContent = "Inaccurate or outdated size chart? Use our plugin to take the current size chart and see our size recommendation.";
         sizeChartContainer.appendChild(message);
     } else {
-        
+
         // Fallback message when size chart is not available
         const fallbackMessage = document.createElement('p');
         fallbackMessage.textContent = "We don't have a size chart for this apparel on file. Try taking a screenshot of the size chart and see our size recommendation.";
@@ -152,7 +150,7 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
     // Create a close button
     const closeButton = document.createElement('button');
     closeButton.textContent = 'Close';
-    closeButton.onclick = function() {
+    closeButton.onclick = function () {
         document.body.removeChild(popupContainer);
     };
     closeButton.style.position = 'absolute';
@@ -163,16 +161,16 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
     popupContainer.appendChild(closeButton);
 
     makeDraggable(popupContainer);
-  
+
     // Add the popup to the body
     document.body.appendChild(popupContainer);
 
     if (sizeChartData) {
-      highlightUserDimensions(userDimensions);
+        highlightUserDimensions(userDimensions);
     }
-  }
+}
 
-  function parseDimensionRange(rangeStr) {
+function parseDimensionRange(rangeStr) {
     // Function to convert fractional sizes to decimal
     function convertFractionalSize(sizeStr) {
         if (sizeStr.includes('½')) {
@@ -204,7 +202,7 @@ function highlightUserDimensions(userDimensions) {
 
         cells.forEach((cell, index) => {
             const headerText = headers[index].textContent.trim().replace(/\s+/g, '').toLowerCase();
-            let userDimensionKey = Object.keys(userDimensions).find(key => 
+            let userDimensionKey = Object.keys(userDimensions).find(key =>
                 key.replace(/\s+/g, '').toLowerCase() === headerText);
 
             // Check for Bust/Chest equivalence
@@ -257,42 +255,44 @@ function highlightUserDimensions(userDimensions) {
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === 'showLoading') {
-    showLoadingPopup('Generating Virtual Try-On, Please Wait...');
-  }
-  else if (message.action === 'replaceImage') {
-    hideLoadingPopup();
+    if (message.action === 'showLoading') {
+        showLoadingPopup('Generating Virtual Try-On, Please Wait...');
+    }
+    else if (message.action === 'replaceImage') {
+        hideLoadingPopup();
 
-    fetchAndRenderSizeChart(message.productUrl, message.pageTitle, message.srcUrl, message.pageTitle)
-        .then(sizeChartData => {
-            createPopup(message.newImageBase64, sizeChartData, message.userDimensions);
-        });
-    rightClickedElement = null; // Reset the right-clicked element
-  } else if (message.action === 'getRecommendations') {
-    showLoadingPopup('Generating AI size recommendations, Please Wait...');
-    fetchRecommendations(message.userDimensions, message.base64ScreenShot);
-  } else if (message.action === "createOverlay") {
-    createOverlay();
-  } else if (message.action === "processCapturedImage") {
-    cropImage(message.dataUrl, message.selection);
-  }
+        fetchAndRenderSizeChart(message.productUrl, message.pageTitle, message.srcUrl, message.pageTitle)
+            .then(sizeChartData => {
+                createPopup(message.newImageBase64, sizeChartData, message.userDimensions);
+            });
+        rightClickedElement = null; // Reset the right-clicked element
+    } else if (message.action === 'getRecommendations') {
+        showLoadingPopup('Generating AI size recommendations, Please Wait...');
+        fetchRecommendations(message.userDimensions, message.base64ScreenShot);
+    } else if (message.action === "createOverlay") {
+        createOverlay();
+    } else if (message.action === "processCapturedImage") {
+        cropImage(message.dataUrl, message.selection);
+    } else if (message.action === "showHelpfulVids") {
+        showHelpfulVidsPopup();
+    }
 });
 
 function cropImage(dataUrl, selection) {
     const pixelRatio = window.devicePixelRatio || 1;
     const img = new Image();
-    img.onload = function() {
+    img.onload = function () {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = selection.width * pixelRatio;
         canvas.height = selection.height * pixelRatio;
-        ctx.drawImage(img, 
-            selection.x * pixelRatio, 
-            selection.y * pixelRatio, 
-            selection.width * pixelRatio, 
-            selection.height * pixelRatio, 
-            0, 0, 
-            selection.width * pixelRatio, 
+        ctx.drawImage(img,
+            selection.x * pixelRatio,
+            selection.y * pixelRatio,
+            selection.width * pixelRatio,
+            selection.height * pixelRatio,
+            0, 0,
+            selection.width * pixelRatio,
             selection.height * pixelRatio
         );
         const croppedDataUrl = canvas.toDataURL('image/png');
@@ -317,15 +317,15 @@ function fetchRecommendations(bodyMeasurements, base64ScreenShot) {
         },
         body: JSON.stringify(postData)
     })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-        createAndShowTextPopup(data)
-    })
-    .catch(error => console.error('Error:', error))
-    .finally(() => {
-        hideLoadingPopup(); // Hide the loading popup regardless of the outcome
-    });
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            createAndShowTextPopup(data)
+        })
+        .catch(error => console.error('Error:', error))
+        .finally(() => {
+            hideLoadingPopup(); // Hide the loading popup regardless of the outcome
+        });
 }
 
 function createAndShowTextPopup(dataText) {
@@ -359,7 +359,7 @@ function createAndShowTextPopup(dataText) {
     closeButton.style.position = 'absolute';
     closeButton.style.top = '10px';
     closeButton.style.right = '10px';
-    closeButton.onclick = function() {
+    closeButton.onclick = function () {
         document.body.removeChild(popupContainer);
     };
 
@@ -371,100 +371,100 @@ function createAndShowTextPopup(dataText) {
 }
 
 function fetchAndRenderSizeChart(currentUrl, pageTitle, srcUrl, pageTitle) {
-  showLoadingPopup('Generating size recommendation for you...');
-  const apiUrl = 'https://api.tianlong.co.uk/get-size-guide';
+    showLoadingPopup('Generating size recommendation for you...');
+    const apiUrl = 'https://api.tianlong.co.uk/get-size-guide';
 
-  // Prepare the data to be sent in the POST request
-  const postData = {
-      category_id: 'bottoms-women',
-      product_url: currentUrl,
-      page_title: pageTitle,
-      img_src_url: srcUrl,
-      page_title: pageTitle
-  };
+    // Prepare the data to be sent in the POST request
+    const postData = {
+        category_id: 'bottoms-women',
+        product_url: currentUrl,
+        page_title: pageTitle,
+        img_src_url: srcUrl,
+        page_title: pageTitle
+    };
 
-  return fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(postData)
-  })
-  .then(response => {
-      if (!response.ok) {
-          if (response.status === 404) {
-              console.log('Size guide not found');
-              return null; // Return null to indicate no data
-          }
-          console.log('Failed to get size guide');
-          return null;
-      }
-      return response.json();
-  })
-  .then(data => {
-      // This data will now be used in createPopup
-      return data;
-  })
-  .catch(error => {
-      console.error('Error:', error);
-      return null; // Return null to indicate an error
-  })
-  .finally(() => {
-      hideLoadingPopup(); // Hide the loading popup regardless of the outcome
-  });
+    return fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData)
+    })
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 404) {
+                    console.log('Size guide not found');
+                    return null; // Return null to indicate no data
+                }
+                console.log('Failed to get size guide');
+                return null;
+            }
+            return response.json();
+        })
+        .then(data => {
+            // This data will now be used in createPopup
+            return data;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            return null; // Return null to indicate an error
+        })
+        .finally(() => {
+            hideLoadingPopup(); // Hide the loading popup regardless of the outcome
+        });
 }
 
 function showLoadingPopup(loadingText) {
-  const loadingPopup = document.createElement('div');
-  loadingPopup.id = 'my-extension-loading-popup';
-  loadingPopup.style.position = 'fixed';
-  loadingPopup.style.top = '50%';
-  loadingPopup.style.left = '50%';
-  loadingPopup.style.transform = 'translate(-50%, -50%)';
-  loadingPopup.style.zIndex = '100000';
-  loadingPopup.style.padding = '20px';
-  loadingPopup.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
-  loadingPopup.style.borderRadius = '8px';
-  loadingPopup.style.display = 'flex';
-  loadingPopup.style.justifyContent = 'center';
-  loadingPopup.style.alignItems = 'center';
-  loadingPopup.style.flexDirection = 'column';
-  loadingPopup.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+    const loadingPopup = document.createElement('div');
+    loadingPopup.id = 'my-extension-loading-popup';
+    loadingPopup.style.position = 'fixed';
+    loadingPopup.style.top = '50%';
+    loadingPopup.style.left = '50%';
+    loadingPopup.style.transform = 'translate(-50%, -50%)';
+    loadingPopup.style.zIndex = '100000';
+    loadingPopup.style.padding = '20px';
+    loadingPopup.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+    loadingPopup.style.borderRadius = '8px';
+    loadingPopup.style.display = 'flex';
+    loadingPopup.style.justifyContent = 'center';
+    loadingPopup.style.alignItems = 'center';
+    loadingPopup.style.flexDirection = 'column';
+    loadingPopup.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
 
-  const spinner = document.createElement('div');
-  spinner.style.border = '5px solid #f3f3f3';
-  spinner.style.borderTop = '5px solid #3498db';
-  spinner.style.borderRadius = '50%';
-  spinner.style.width = '50px';
-  spinner.style.height = '50px';
-  spinner.style.animation = 'spin 1s linear infinite';
+    const spinner = document.createElement('div');
+    spinner.style.border = '5px solid #f3f3f3';
+    spinner.style.borderTop = '5px solid #3498db';
+    spinner.style.borderRadius = '50%';
+    spinner.style.width = '50px';
+    spinner.style.height = '50px';
+    spinner.style.animation = 'spin 1s linear infinite';
 
-  const spinnerText = document.createElement('div');
-  spinnerText.textContent = loadingText;
-  spinnerText.style.marginTop = '10px';
+    const spinnerText = document.createElement('div');
+    spinnerText.textContent = loadingText;
+    spinnerText.style.marginTop = '10px';
 
-  loadingPopup.appendChild(spinner);
-  loadingPopup.appendChild(spinnerText);
-  document.body.appendChild(loadingPopup);
+    loadingPopup.appendChild(spinner);
+    loadingPopup.appendChild(spinnerText);
+    document.body.appendChild(loadingPopup);
 
-  // Add the @keyframes for the spinner
-  const styleSheet = document.createElement("style");
-  styleSheet.type = "text/css";
-  styleSheet.innerText = `
+    // Add the @keyframes for the spinner
+    const styleSheet = document.createElement("style");
+    styleSheet.type = "text/css";
+    styleSheet.innerText = `
       @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
       }
   `;
-  document.head.appendChild(styleSheet);
+    document.head.appendChild(styleSheet);
 }
 
 // Function to hide the loading popup
 function hideLoadingPopup() {
-  const loadingPopup = document.getElementById('my-extension-loading-popup');
-  if (loadingPopup) {
-      document.body.removeChild(loadingPopup);
-  }
+    const loadingPopup = document.getElementById('my-extension-loading-popup');
+    if (loadingPopup) {
+        document.body.removeChild(loadingPopup);
+    }
 }
 
 function createOverlay() {
@@ -551,14 +551,14 @@ function endSelection() {
         overlay.removeEventListener('mousedown', startSelection);
         overlay.removeEventListener('mousemove', resizeSelection);
         overlay.removeEventListener('mouseup', endSelection);
-        
+
         const selectionCoordinates = {
             x: parseInt(selectionBox.style.left, 10),
             y: parseInt(selectionBox.style.top, 10),
             width: parseInt(selectionBox.style.width, 10),
             height: parseInt(selectionBox.style.height, 10)
         };
-        
+
         // Send coordinates to background script
         chrome.runtime.sendMessage({ action: "captureSelectedArea", coordinates: selectionCoordinates });
 
@@ -567,3 +567,138 @@ function endSelection() {
         isSelecting = false;
     }
 }
+
+// Tutorial videos popup
+function showHelpfulVidsPopup() {
+    const headerHtml = document.createElement('div');
+    headerHtml.innerHTML = `
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    `;
+    document.head.appendChild(headerHtml);
+
+    const style = document.createElement('style');
+    style.textContent = `
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: brown;
+    }
+    
+    #vidsPopup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        z-index: 9999999;
+        width: 800px;
+        height: 550px;
+        transform: translate(-50%, -50%);
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        display: block;
+    }
+    
+    #vidsPopupContent {
+        padding: 20px 120px 35px 120px;
+    }
+    
+    #vidsTitleContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    #vidsTitleContainer img {
+        width: 34px;
+        height: 34px;
+    }
+    
+    #vidsTitleContainer p {
+        font-family: "Bai Jamjuree", sans-serif;
+        font-weight: 600;
+        font-style: normal;
+        font-size: 22px;
+    
+        margin-top: 20px;
+        margin-bottom: 40px;
+    }
+    
+    #vidsContentContainer {
+        display: flex;
+        flex-direction: column;
+        gap: 20.5px;
+    }
+    
+    #vidsVidContentContainer {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    #vidsVidContentContainer p {
+        font-family: "Bai Jamjuree", sans-serif;
+        font-weight: 200;
+        font-style: normal;
+        font-size: 18px;
+        width: 230px;
+    }
+    
+    #videoSeparator {
+        border: none;
+        border-top: 1px dotted black;
+        height: 1px;
+        width: 100%;
+        margin: 0;
+    }
+    
+    #vidsCloseBtn {
+        border: none;
+        cursor: pointer;
+        padding: 2px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s ease;
+        backdrop-filter: blur(4px);
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }`;
+    document.head.appendChild(style);
+
+    const popup = document.createElement('div');
+    popup.innerHTML = `
+    <div id="vidsPopupContent">
+        <div id="vidsTitleContainer">
+            <img src="https://bs-core-user-icons.s3.us-west-2.amazonaws.com/vids-title-icon.svg"/>
+            <p>Helpful Videos</p>
+        </div>
+        <div id="vidsContentContainer">
+            <div id="vidsVidContentContainer">
+                <p>How to use size recommendation across brands?</p>
+                <iframe width="300" height="169" src="https://www.youtube.com/embed/7BGPnZfP2pA?si=EDnmaohLCITeq_v4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+            <hr id="videoSeparator">
+            <div id="vidsVidContentContainer">
+                <p>All-in-one rightclick virtual tryon</p>
+                <iframe width="300" height="169" src="https://www.youtube.com/embed/FGbJv4Yw9YU?si=BAGrCltmg4g1DVBI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>                </div>
+        </div>
+    </div>`;
+    popup.id = "vidsPopup";
+
+    const closeButton = document.createElement('button');
+    closeButton.id = 'vidsCloseBtn';
+    closeButton.innerHTML = `
+        <img src="https://bs-core-user-icons.s3.us-west-2.amazonaws.com/vids-icon-close.svg" alt="Close Icon" />
+    `;
+    closeButton.onclick = function () {
+        var elementToRemove = document.getElementById('vidsPopup');
+        document.body.removeChild(elementToRemove);
+    };
+    popup.appendChild(closeButton);
+    document.body.appendChild(popup);
+};
