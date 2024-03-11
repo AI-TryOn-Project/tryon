@@ -667,7 +667,18 @@ function showHelpfulVidsPopup() {
         position: absolute;
         top: 20px;
         right: 20px;
-    }`;
+    }
+    
+    #vidsPopupBG {
+        z-index: 9999998;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.4);
+        position: fixed;
+        top: 0;
+        left: 0;
+    }
+    `;
     document.head.appendChild(style);
 
     const popup = document.createElement('div');
@@ -696,9 +707,13 @@ function showHelpfulVidsPopup() {
         <img src="https://bs-core-user-icons.s3.us-west-2.amazonaws.com/vids-icon-close.svg" alt="Close Icon" />
     `;
     closeButton.onclick = function () {
-        var elementToRemove = document.getElementById('vidsPopup');
+        var elementToRemove = document.getElementById('vidsPopupBG');
         document.body.removeChild(elementToRemove);
     };
     popup.appendChild(closeButton);
-    document.body.appendChild(popup);
+    const vidsPopupBG = document.createElement('div');
+    vidsPopupBG.id = 'vidsPopupBG';
+    vidsPopupBG.appendChild(popup);
+
+    document.body.appendChild(vidsPopupBG);
 };
