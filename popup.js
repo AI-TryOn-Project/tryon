@@ -48,6 +48,15 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Last selected tab
+    chrome.storage.local.get('selectedDimTab', function (result) {        
+        if (result.selectedDimTab) {
+            switchTab(1);
+        } else {
+            switchTab(0);
+        }
+    });
+
     // Load and display the stored image if it exists
     chrome.storage.local.get('uploadedImage', function (data) {
         if (data.uploadedImage) {
@@ -207,6 +216,22 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+// Your existing switchTab function
+function switchTab(tabIndex) {
+    var i, tabcontent, tabs;
+    tabcontent = document.getElementsByClassName("tab-content");
+    tabs = document.getElementsByClassName("tab-bar-tab");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+        tabs[i].classList.remove("selected");
+    }
+    document.getElementById("tab" + tabIndex + "Content").style.display = "block";
+    tabs[tabIndex].classList.add("selected");
+
+    // Persist selection
+    chrome.storage.local.set({'selectedDimTab': tabIndex === 1});
+}
+
 // Tabbar logic
 document.addEventListener('DOMContentLoaded', function () {
     // Attach click event listeners to tab bar tabs
@@ -216,21 +241,6 @@ document.addEventListener('DOMContentLoaded', function () {
             switchTab(index);
         });
     });
-
-    // Your existing switchTab function
-    function switchTab(tabIndex) {
-        var i, tabcontent, tabs;
-        tabcontent = document.getElementsByClassName("tab-content");
-        tabs = document.getElementsByClassName("tab-bar-tab");
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
-            tabs[i].classList.remove("selected");
-        }
-        document.getElementById("tab" + tabIndex + "Content").style.display = "block";
-        tabs[tabIndex].classList.add("selected");
-    }
-
-    switchTab(0);
 });
 
 // Dim switch
