@@ -244,16 +244,16 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // Dim switch
-document.getElementById("dim-switch-btn").addEventListener("click", function () {
-    this.classList.toggle("dim-switch-selected");
-    let option = this.classList.contains("dim-switch-selected") ? "in" : "cm";
+// document.getElementById("dim-switch-btn").addEventListener("click", function () {
+//     this.classList.toggle("dim-switch-selected");
+//     let option = this.classList.contains("dim-switch-selected") ? "in" : "cm";
 
-    // Update labels for all textfields
-    let labels = document.querySelectorAll(".tab-content-body-dim-text-label");
-    labels.forEach(label => {
-        label.textContent = option;
-    });
-});
+//     // Update labels for all textfields
+//     let labels = document.querySelectorAll(".tab-content-body-dim-text-label");
+//     labels.forEach(label => {
+//         label.textContent = option;
+//     });
+// });
 
 // Minimize logic
 document.addEventListener('DOMContentLoaded', function () {
