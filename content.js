@@ -193,8 +193,13 @@ function parseDimensionRange(rangeStr) {
 
 function highlightUserDimensions(userDimensions) {
     const rows = document.querySelectorAll('#sizeChartTable tr:not(:first-child)');
-    let closestCell = null;
-    let closestDistance = Infinity;
+
+    // Track the closest cell for each dimension
+    let closestCells = {
+        bust: { cell: null, distance: Infinity },
+        hips: { cell: null, distance: Infinity },
+        waist: { cell: null, distance: Infinity }
+    };
 
     rows.forEach(row => {
         const cells = row.querySelectorAll('td');
@@ -202,56 +207,50 @@ function highlightUserDimensions(userDimensions) {
 
         cells.forEach((cell, index) => {
             const headerText = headers[index].textContent.trim().replace(/\s+/g, '').toLowerCase();
-            let userDimensionKey = Object.keys(userDimensions).find(key =>
-                key.replace(/\s+/g, '').toLowerCase() === headerText);
+            let userDimensionKey = null;
 
-            // Check for Bust/Chest equivalence
-            if (!userDimensionKey && (headerText === 'bust' || headerText === 'chest')) {
-                userDimensionKey = ['bust', 'chest'].find(key => key in userDimensions);
+            // Identify the dimension
+            if (headerText === 'bust' || headerText === 'chest') {
+                userDimensionKey = 'bust';
+            } else if (headerText === 'hips' || headerText === 'hip') {
+                userDimensionKey = 'hips';
+            } else if (headerText === 'waist') {
+                userDimensionKey = 'waist';
             }
 
-            if (userDimensionKey) {
+            if (userDimensionKey && userDimensions[userDimensionKey] !== undefined) {
                 const cellDimensionRange = parseDimensionRange(cell.textContent.trim());
                 const userDimensionValue = parseFloat(userDimensions[userDimensionKey]);
 
                 // Check if the user dimension is within the range
                 if (userDimensionValue >= cellDimensionRange.min && userDimensionValue <= cellDimensionRange.max) {
-                    if (closestCell && closestDistance === 0) {
-                        // If there's already an exact match, compare which one is more precise
-                        const currentDistance = cellDimensionRange.max - cellDimensionRange.min;
-                        if (currentDistance < closestDistance) {
-                            closestCell.classList.remove('highlight');
-                            cell.classList.add('highlight');
-                            closestDistance = currentDistance;
-                        }
-                    } else {
-                        // Found a matching range
-                        cell.classList.add('highlight');
-                        closestDistance = cellDimensionRange.max - cellDimensionRange.min;
-                        closestCell = cell;
-                    }
-                } else if (closestDistance !== 0) {
-                    // Determine if this cell is the closest match so far
+                    // If there's an exact match, highlight immediately and stop looking for this dimension
+                    closestCells[userDimensionKey].cell = cell;
+                    closestCells[userDimensionKey].distance = 0;
+                    cell.classList.add('highlight');
+                } else {
+                    // Determine if this cell is the closest match so far for the dimension
                     const distance = Math.min(
                         Math.abs(cellDimensionRange.min - userDimensionValue),
                         Math.abs(cellDimensionRange.max - userDimensionValue)
                     );
-                    if (distance < closestDistance) {
-                        if (closestCell) {
-                            closestCell.classList.remove('highlight');
-                        }
-                        closestDistance = distance;
-                        closestCell = cell;
+
+                    if (distance < closestCells[userDimensionKey].distance) {
+                        closestCells[userDimensionKey].distance = distance;
+                        closestCells[userDimensionKey].cell = cell;
                     }
                 }
             }
         });
     });
 
-    // Highlight the closest cell if no exact match was found
-    if (closestCell && closestDistance !== 0) {
-        closestCell.classList.add('highlight');
-    }
+    // Highlight the closest cell for each dimension if no exact match was found
+    Object.keys(closestCells).forEach(dimension => {
+        const { cell, distance } = closestCells[dimension];
+        if (cell && distance !== 0) {
+            cell.classList.add('highlight');
+        }
+    });
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
