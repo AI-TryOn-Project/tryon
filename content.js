@@ -306,7 +306,8 @@ function fetchRecommendations(bodyMeasurements, base64ScreenShot) {
     // Prepare the data to be sent in the POST request
     const postData = {
         base64_image: base64ScreenShot,
-        body_measurements: bodyMeasurements
+        body_measurements: bodyMeasurements,
+        showing_chart: true
     };
 
     fetch(apiUrl, {
@@ -327,7 +328,9 @@ function fetchRecommendations(bodyMeasurements, base64ScreenShot) {
         });
 }
 
-function createAndShowTextPopup(dataText) {
+function createAndShowTextPopup(dataHtml) {
+
+    const cleanedDataHtml = dataHtml.replace(/^```html ,|```$/g, '').trim();
     // Create the popup container
     const popupContainer = document.createElement('div');
     popupContainer.id = 'my-extension-popup-container';
@@ -335,22 +338,20 @@ function createAndShowTextPopup(dataText) {
     popupContainer.style.top = '20%';
     popupContainer.style.left = '50%';
     popupContainer.style.transform = 'translateX(-50%)';
-    popupContainer.style.zIndex = '100000';  // Same z-index as the loading popup
+    popupContainer.style.zIndex = '10000000';  // Ensure high enough z-index to be on top
     popupContainer.style.padding = '20px';
-    popupContainer.style.backgroundColor = 'rgba(255, 255, 255, 1)'; // Similar to loading popup
+    popupContainer.style.backgroundColor = 'rgba(255, 255, 255, 1)';
     popupContainer.style.borderRadius = '10px';
     popupContainer.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
     popupContainer.style.maxWidth = '80%';
     popupContainer.style.maxHeight = '60%';
     popupContainer.style.overflowY = 'auto';
 
-    // Create the text element
-    const textElement = document.createElement('p');
-    textElement.textContent = dataText;
-    textElement.style.margin = '0';
+    // Directly set the innerHTML of the popup container to the returned HTML
+    popupContainer.innerHTML = cleanedDataHtml;
 
-    // Append the text element to the popup container
-    popupContainer.appendChild(textElement);
+    // Since the HTML content might already include structured elements,
+    // there's no need to create a specific paragraph element for text content.
 
     // Create a close button
     const closeButton = document.createElement('button');
@@ -362,12 +363,14 @@ function createAndShowTextPopup(dataText) {
         document.body.removeChild(popupContainer);
     };
 
-    // Append the close button to the popup container
+    // The closeButton needs to be appended after setting innerHTML
+    // to avoid overwriting it with the returned HTML content
     popupContainer.appendChild(closeButton);
 
     // Append the popup container to the body
     document.body.appendChild(popupContainer);
 }
+
 
 function fetchAndRenderSizeChart(currentUrl, pageTitle, srcUrl, pageTitle) {
     showLoadingPopup('Generating size recommendation for you...');
@@ -420,7 +423,7 @@ function showLoadingPopup(loadingText) {
     loadingPopup.style.top = '50%';
     loadingPopup.style.left = '50%';
     loadingPopup.style.transform = 'translate(-50%, -50%)';
-    loadingPopup.style.zIndex = '100000';
+    loadingPopup.style.zIndex = '10000000';
     loadingPopup.style.padding = '20px';
     loadingPopup.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
     loadingPopup.style.borderRadius = '8px';
