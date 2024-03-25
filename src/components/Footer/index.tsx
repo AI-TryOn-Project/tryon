@@ -16,7 +16,10 @@ const Footer = () => {
     <div className="footer-container">
       <div
         className={`tab-bar-tab ${curTab === CUR_TAB.UPLOAD ? 'active' : ''}`}
-        onClick={() => dispatch(changeTab(CUR_TAB.UPLOAD))}>
+        onClick={() => {
+          console.log(11111)
+          dispatch(changeTab(CUR_TAB.UPLOAD))
+        }}>
         <img
           src={leftTab}
           alt="Icon 0"

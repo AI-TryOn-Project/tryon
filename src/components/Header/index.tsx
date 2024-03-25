@@ -5,17 +5,14 @@ import iconMin from '../../resources/icon-min.svg';
 
 const Header = () => {
   const dispatch = useAppDispatch()
-
-  // Make sure to use "useAppSelector" instead of "useSelector" to automatically get the correct types
-
   return (
-    <div className="">
-      <button id="closeBtn" className="icon-btn icon-btn-close">
-        <img src={iconMin} alt="Cross Icon" />
-      </button> 
-      <button id="minBtn" className="icon-btn icon-btn-min">
-        <img src={closeIcon} alt="Min Icon" />
-      </button>
+    <div className="header-container">
+      <div id="minBtn" className="icon-btn icon-btn-min" >
+        <img src={iconMin} alt="Close" />
+      </div> 
+      <div id="closeBtn" className="icon-btn icon-btn-close" onClick={()=>{window.close()}}>
+        <img src={closeIcon} alt="Min" />
+      </div>
     </div>
   )
 }
