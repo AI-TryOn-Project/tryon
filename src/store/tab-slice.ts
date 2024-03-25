@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit"
 import {CUR_TAB} from '../config/index'
-export interface CounterState {
+export interface TabSliceState {
   curTab: CUR_TAB
 }
 

@@ -17,10 +17,12 @@ import {
 import { Storage } from "@plasmohq/storage"
 
 import curTabSlice from "~src/store/tab-slice"
+import modeSlice from "~src/store/mode-slice"
 
 // Here you can add all your reducers
 const combinedReducers = combineReducers({
-  curTab:curTabSlice
+  curTab:curTabSlice,
+  mode:modeSlice
 })
 
 const persistConfig = {
