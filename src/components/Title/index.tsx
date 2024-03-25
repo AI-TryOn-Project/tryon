@@ -1,17 +1,20 @@
-import { useAppDispatch, useAppSelector } from "~src/store/store"
-import "./index.less"
-import { CUR_TAB } from "~src/config"
-
+import { useAppDispatch, useAppSelector } from "~src/store/store";
+import "./index.less";
+import { CUR_TAB } from "~src/config";
+import UploadText from '../../resources/upload_text.png';
+import BodyText from '../../resources/body_text.png';
 const Title = () => {
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
 
   // Make sure to use "useAppSelector" instead of "useSelector" to automatically get the correct types
-  const curTab = useAppSelector((state) => state.curTab.curTab)
+  const curTab = useAppSelector((state) => state.curTab.curTab);
 
   return (
     <div className="title-container">
-        <h1>{curTab === CUR_TAB.BODY?'Enter Body Dimensions':'Upload Profile Photo'}</h1>
+      <img
+        src={curTab === CUR_TAB.BODY ? BodyText : UploadText}
+      />
     </div>
-  )
-}
-export default Title
+  );
+};
+export default Title;
