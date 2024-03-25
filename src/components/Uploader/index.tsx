@@ -1,35 +1,46 @@
-import React from 'react';
-import { message, Upload } from 'antd';
+import React, { useEffect } from 'react';
+import { Upload } from 'antd';
+import { useAppDispatch, useAppSelector } from "~src/store/store";
+import { changeImg } from '~src/store/data-slice';
+import './index.less';
+import UploadImg from '../../resources/icon-upload-img.svg';
+import { processAndGenerateThumbnail } from '~src/utils';
+
 const { Dragger } = Upload;
-const props = {
-  name: 'file',
-  multiple: true,
-  action: 'https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188',
-  onChange(info) {
-    const { status } = info.file;
-    if (status !== 'uploading') {
-      console.log(info.file, info.fileList);
-    }
-    if (status === 'done') {
-      message.success(`${info.file.name} file uploaded successfully.`);
-    } else if (status === 'error') {
-      message.error(`${info.file.name} file upload failed.`);
-    }
-  },
-  onDrop(e) {
-    console.log('Dropped files', e.dataTransfer.files);
-  },
+
+type Props = {
+  handleOnChange: (file: File) => void;
 };
-const Uploader = () => (
-  <Dragger {...props}>
-    <p className="ant-upload-drag-icon">
-        111
-    </p>
-    <p className="ant-upload-text">Click or drag file to this area to upload</p>
-    <p className="ant-upload-hint">
-      Support for a single or bulk upload. Strictly prohibited from uploading company data or other
-      banned files.
-    </p>
-  </Dragger>
-);
-export default Uploader;
+
+
+const Index: React.FC<Props> = ({ handleOnChange }) => {
+  const dispatch = useAppDispatch();
+  const base64_image = useAppSelector((state) => state.data.base64_image);
+  const handleUploadOnchange = async (file: File, maxSize = 5) => {
+    const result = await processAndGenerateThumbnail(file, maxSize);
+    dispatch(changeImg(result.thumbnailDataUrl));
+  };
+  return (
+    <div className='wrapper'>
+      <Dragger
+        maxCount={1}
+        accept=".png, .jpg, .jpeg"
+        showUploadList={false}
+        customRequest={() => { }}
+        beforeUpload={() => false}
+        onChange={({ file }) => {
+          handleUploadOnchange(file as any);
+        }}
+      >
+        <div className={'tips-wrapper'}>
+          <div className="ant-upload-drag-icon">
+            <img src={UploadImg} alt="" />
+          </div>
+          <p className="ant-upload-text">Drag image here or Select image to upload</p>
+        </div>
+      </Dragger>
+    </div>
+  );
+};
+
+export default Index;

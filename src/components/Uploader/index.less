@@ -1,0 +1,85 @@
+/* stylelint-disable order/properties-order */
+/* stylelint-disable rule-empty-line-before */
+.wrapper {
+ background: rgba(255, 255, 255, 0.8);
+  width: 150px;
+  height: 100px;
+  .default-upload {
+    box-sizing: border-box;
+    width: 135px;
+    height: 68px;
+    overflow: hidden;
+
+    background: #fff;
+  }
+
+  .mini-upload {
+    width: 68px;
+    height: 68px;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .tips-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+  margin-top: 8px;
+}
+
+:global {
+  .ant-upload.ant-upload-drag {
+    background: rgba(255, 255, 255, 0.03);
+    background-repeat: no-repeat;
+    background-size: contain;
+    border: 0.5px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 4%;
+
+    transition: unset;
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+  }
+  .ant-upload.ant-upload-drag .ant-upload {
+    padding: 14.5px 0 !important;
+  }
+  .ant-upload.ant-upload-drag.ant-upload-drag-hover:not(.ant-upload-disabled) {
+    border: 0.5px dashed rgba(255, 255, 255, 0.6);
+
+    svg {
+      opacity: 0.6;
+    }
+
+ 
+  }
+
+  .ant-upload.ant-upload-drag:not(.ant-upload-disabled):hover {
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .ant-upload.ant-upload-drag p.ant-upload-drag-icon {
+    margin-bottom: 0;
+  }
+
+  .ant-upload.ant-upload-drag p.ant-upload-text {
+    margin: 0;
+
+    color: #fff;
+    font-weight: 400;
+    font-size: 11px;
+    line-height: 16px;
+
+    opacity: 0.3;
+  }
+}
+
+
+
+.ant-upload-text {
+  opacity: 0.6;
+  font-size: 9px !important;
+  font-family: Abel !important;
+}
