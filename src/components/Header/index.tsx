@@ -1,5 +1,7 @@
 import { useAppDispatch, useAppSelector } from "~src/store/store"
 import "./index.less"
+import closeIcon from '../../resources/icon-close.svg'; 
+import iconMin from '../../resources/icon-min.svg'; 
 
 const Header = () => {
   const dispatch = useAppDispatch()
@@ -9,10 +11,10 @@ const Header = () => {
   return (
     <div className="">
       <button id="closeBtn" className="icon-btn icon-btn-close">
-        <img src="~src/resources/icon-close.svg" alt="Cross Icon" />
-      </button>
+        <img src={iconMin} alt="Cross Icon" />
+      </button> 
       <button id="minBtn" className="icon-btn icon-btn-min">
-        <img src="~src/resources/icon-min.svg" alt="Min Icon" />
+        <img src={closeIcon} alt="Min Icon" />
       </button>
     </div>
   )
