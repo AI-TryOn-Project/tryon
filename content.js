@@ -278,9 +278,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         cropImage(message.dataUrl, message.selection);
     } else if (message.action === "showHelpfulVids") {
 
-        // 检查页面中是否已经出现了弹窗,如果出现了不再重复弹出
-        var existingElement = document.getElementById("vidsPopupBG");
-        console.log(existingElement, 6666);
+        // 检查页面中是否已经出现了弹窗, 如果出现了不再重复弹出;
+        var existingElement = document.getElementById("vidsPopupContent");
         if (!existingElement) {
             showHelpfulVidsPopup();
         }
@@ -595,7 +594,6 @@ function showHelpfulVidsPopup() {
     body {
         margin: 0;
         padding: 0;
-        background-color: brown;
     }
     
     #vidsPopup {
