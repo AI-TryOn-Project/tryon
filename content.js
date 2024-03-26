@@ -277,7 +277,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     } else if (message.action === "processCapturedImage") {
         cropImage(message.dataUrl, message.selection);
     } else if (message.action === "showHelpfulVids") {
-        showHelpfulVidsPopup();
+
+        // 检查页面中是否已经出现了弹窗,如果出现了不再重复弹出
+        var existingElement = document.getElementById("vidsPopupBG");
+        console.log(existingElement, 6666);
+        if (!existingElement) {
+            showHelpfulVidsPopup();
+        }
     }
 });
 
@@ -324,7 +330,7 @@ function fetchRecommendations(bodyMeasurements, base64ScreenShot) {
         .then(response => response.json())
         .then(data => {
             console.log(data);
-            createPopup(null, JSON.parse(data), bodyMeasurements)
+            createPopup(null, JSON.parse(data), bodyMeasurements);
         })
         .catch(error => console.error('Error:', error))
         .finally(() => {
