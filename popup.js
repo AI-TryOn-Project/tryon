@@ -130,7 +130,7 @@ document.getElementById('uploadBtn').addEventListener('click', function () {
         document.getElementById("imageUploadLabelPrompt").textContent = "Drag image here or Select image to upload";
 
         // Replace upload prompt
-        document.getElementById("imageUploadPrompt").textContent = "Capture your clear, well-lit, frontal facial image for optimal results.";
+        document.getElementById("imageUploadPrompt").textContent = "Clear, well-lit facial image";
 
         // Upload btn -> change btn
         document.getElementById("uploadBtnText").textContent = "UPLOAD";
@@ -138,7 +138,6 @@ document.getElementById('uploadBtn').addEventListener('click', function () {
 
         // Purge selected img
         fileToUpload = undefined;
-
         return;
     }
 
