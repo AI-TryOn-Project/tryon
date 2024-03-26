@@ -133,7 +133,9 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
         sizeChartContainer.appendChild(sizeChartTable);
         const message = document.createElement('p');
         message.textContent = "Inaccurate or outdated size chart? Use our plugin to take the current size chart and see our size recommendation.";
-        sizeChartContainer.appendChild(message);
+        if (imageBase64) {
+            sizeChartContainer.appendChild(message);
+        }
     } else {
 
         // Fallback message when size chart is not available
@@ -143,7 +145,9 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
         imageElement.style.maxWidth = '100%'; // Use more space for the image when there is no size chart
     }
     // Append the image and close button to the popup
-    popupContainer.appendChild(imageElement);
+    if (imageBase64) {
+        popupContainer.appendChild(imageElement);
+    }
     // Append the size chart container to the popup
     popupContainer.appendChild(sizeChartContainer);
 
@@ -320,7 +324,7 @@ function fetchRecommendations(bodyMeasurements, base64ScreenShot) {
         .then(response => response.json())
         .then(data => {
             console.log(data);
-            createAndShowTextPopup(data)
+            createPopup(null, JSON.parse(data), bodyMeasurements)
         })
         .catch(error => console.error('Error:', error))
         .finally(() => {
