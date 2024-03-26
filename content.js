@@ -133,7 +133,9 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
         sizeChartContainer.appendChild(sizeChartTable);
         const message = document.createElement('p');
         message.textContent = "Inaccurate or outdated size chart? Use our plugin to take the current size chart and see our size recommendation.";
-        sizeChartContainer.appendChild(message);
+        if (imageBase64) {
+            sizeChartContainer.appendChild(message);
+        }
     } else {
 
         // Fallback message when size chart is not available
@@ -143,7 +145,9 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
         imageElement.style.maxWidth = '100%'; // Use more space for the image when there is no size chart
     }
     // Append the image and close button to the popup
-    popupContainer.appendChild(imageElement);
+    if (imageBase64) {
+        popupContainer.appendChild(imageElement);
+    }
     // Append the size chart container to the popup
     popupContainer.appendChild(sizeChartContainer);
 
@@ -193,8 +197,13 @@ function parseDimensionRange(rangeStr) {
 
 function highlightUserDimensions(userDimensions) {
     const rows = document.querySelectorAll('#sizeChartTable tr:not(:first-child)');
-    let closestCell = null;
-    let closestDistance = Infinity;
+
+    // Track the closest cell for each dimension
+    let closestCells = {
+        bust: { cell: null, distance: Infinity },
+        hips: { cell: null, distance: Infinity },
+        waist: { cell: null, distance: Infinity }
+    };
 
     rows.forEach(row => {
         const cells = row.querySelectorAll('td');
@@ -202,56 +211,50 @@ function highlightUserDimensions(userDimensions) {
 
         cells.forEach((cell, index) => {
             const headerText = headers[index].textContent.trim().replace(/\s+/g, '').toLowerCase();
-            let userDimensionKey = Object.keys(userDimensions).find(key =>
-                key.replace(/\s+/g, '').toLowerCase() === headerText);
+            let userDimensionKey = null;
 
-            // Check for Bust/Chest equivalence
-            if (!userDimensionKey && (headerText === 'bust' || headerText === 'chest')) {
-                userDimensionKey = ['bust', 'chest'].find(key => key in userDimensions);
+            // Identify the dimension
+            if (headerText === 'bust' || headerText === 'chest') {
+                userDimensionKey = 'bust';
+            } else if (headerText === 'hips' || headerText === 'hip') {
+                userDimensionKey = 'hips';
+            } else if (headerText === 'waist') {
+                userDimensionKey = 'waist';
             }
 
-            if (userDimensionKey) {
+            if (userDimensionKey && userDimensions[userDimensionKey] !== undefined) {
                 const cellDimensionRange = parseDimensionRange(cell.textContent.trim());
                 const userDimensionValue = parseFloat(userDimensions[userDimensionKey]);
 
                 // Check if the user dimension is within the range
                 if (userDimensionValue >= cellDimensionRange.min && userDimensionValue <= cellDimensionRange.max) {
-                    if (closestCell && closestDistance === 0) {
-                        // If there's already an exact match, compare which one is more precise
-                        const currentDistance = cellDimensionRange.max - cellDimensionRange.min;
-                        if (currentDistance < closestDistance) {
-                            closestCell.classList.remove('highlight');
-                            cell.classList.add('highlight');
-                            closestDistance = currentDistance;
-                        }
-                    } else {
-                        // Found a matching range
-                        cell.classList.add('highlight');
-                        closestDistance = cellDimensionRange.max - cellDimensionRange.min;
-                        closestCell = cell;
-                    }
-                } else if (closestDistance !== 0) {
-                    // Determine if this cell is the closest match so far
+                    // If there's an exact match, highlight immediately and stop looking for this dimension
+                    closestCells[userDimensionKey].cell = cell;
+                    closestCells[userDimensionKey].distance = 0;
+                    cell.classList.add('highlight');
+                } else {
+                    // Determine if this cell is the closest match so far for the dimension
                     const distance = Math.min(
                         Math.abs(cellDimensionRange.min - userDimensionValue),
                         Math.abs(cellDimensionRange.max - userDimensionValue)
                     );
-                    if (distance < closestDistance) {
-                        if (closestCell) {
-                            closestCell.classList.remove('highlight');
-                        }
-                        closestDistance = distance;
-                        closestCell = cell;
+
+                    if (distance < closestCells[userDimensionKey].distance) {
+                        closestCells[userDimensionKey].distance = distance;
+                        closestCells[userDimensionKey].cell = cell;
                     }
                 }
             }
         });
     });
 
-    // Highlight the closest cell if no exact match was found
-    if (closestCell && closestDistance !== 0) {
-        closestCell.classList.add('highlight');
-    }
+    // Highlight the closest cell for each dimension if no exact match was found
+    Object.keys(closestCells).forEach(dimension => {
+        const { cell, distance } = closestCells[dimension];
+        if (cell && distance !== 0) {
+            cell.classList.add('highlight');
+        }
+    });
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -307,7 +310,8 @@ function fetchRecommendations(bodyMeasurements, base64ScreenShot) {
     // Prepare the data to be sent in the POST request
     const postData = {
         base64_image: base64ScreenShot,
-        body_measurements: bodyMeasurements
+        body_measurements: bodyMeasurements,
+        showing_chart: true
     };
 
     fetch(apiUrl, {
@@ -320,7 +324,7 @@ function fetchRecommendations(bodyMeasurements, base64ScreenShot) {
         .then(response => response.json())
         .then(data => {
             console.log(data);
-            createAndShowTextPopup(data)
+            createPopup(null, JSON.parse(data), bodyMeasurements)
         })
         .catch(error => console.error('Error:', error))
         .finally(() => {
@@ -328,7 +332,9 @@ function fetchRecommendations(bodyMeasurements, base64ScreenShot) {
         });
 }
 
-function createAndShowTextPopup(dataText) {
+function createAndShowTextPopup(dataHtml) {
+
+    const cleanedDataHtml = dataHtml.replace(/^```html ,|```$/g, '').trim();
     // Create the popup container
     const popupContainer = document.createElement('div');
     popupContainer.id = 'my-extension-popup-container';
@@ -336,22 +342,20 @@ function createAndShowTextPopup(dataText) {
     popupContainer.style.top = '20%';
     popupContainer.style.left = '50%';
     popupContainer.style.transform = 'translateX(-50%)';
-    popupContainer.style.zIndex = '100000';  // Same z-index as the loading popup
+    popupContainer.style.zIndex = '10000000';  // Ensure high enough z-index to be on top
     popupContainer.style.padding = '20px';
-    popupContainer.style.backgroundColor = 'rgba(255, 255, 255, 1)'; // Similar to loading popup
+    popupContainer.style.backgroundColor = 'rgba(255, 255, 255, 1)';
     popupContainer.style.borderRadius = '10px';
     popupContainer.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
     popupContainer.style.maxWidth = '80%';
     popupContainer.style.maxHeight = '60%';
     popupContainer.style.overflowY = 'auto';
 
-    // Create the text element
-    const textElement = document.createElement('p');
-    textElement.textContent = dataText;
-    textElement.style.margin = '0';
+    // Directly set the innerHTML of the popup container to the returned HTML
+    popupContainer.innerHTML = cleanedDataHtml;
 
-    // Append the text element to the popup container
-    popupContainer.appendChild(textElement);
+    // Since the HTML content might already include structured elements,
+    // there's no need to create a specific paragraph element for text content.
 
     // Create a close button
     const closeButton = document.createElement('button');
@@ -363,12 +367,14 @@ function createAndShowTextPopup(dataText) {
         document.body.removeChild(popupContainer);
     };
 
-    // Append the close button to the popup container
+    // The closeButton needs to be appended after setting innerHTML
+    // to avoid overwriting it with the returned HTML content
     popupContainer.appendChild(closeButton);
 
     // Append the popup container to the body
     document.body.appendChild(popupContainer);
 }
+
 
 function fetchAndRenderSizeChart(currentUrl, pageTitle, srcUrl, pageTitle) {
     showLoadingPopup('Generating size recommendation for you...');
@@ -421,7 +427,7 @@ function showLoadingPopup(loadingText) {
     loadingPopup.style.top = '50%';
     loadingPopup.style.left = '50%';
     loadingPopup.style.transform = 'translate(-50%, -50%)';
-    loadingPopup.style.zIndex = '100000';
+    loadingPopup.style.zIndex = '10000000';
     loadingPopup.style.padding = '20px';
     loadingPopup.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
     loadingPopup.style.borderRadius = '8px';
