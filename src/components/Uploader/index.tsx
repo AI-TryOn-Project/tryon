@@ -9,7 +9,7 @@ import { processAndGenerateThumbnail } from '~src/utils';
 const { Dragger } = Upload;
 
 type Props = {
-  handleOnChange: (file: File) => void;
+  handleOnChange?: (file: File) => void;
 };
 
 
@@ -21,7 +21,9 @@ const Index: React.FC<Props> = ({ handleOnChange }) => {
     dispatch(changeImg(result.thumbnailDataUrl));
   };
   return (
-    <div className='wrapper'>
+    <div className={base64_image ? 'imgWrapper' : 'wrapper'}
+      style={base64_image ? { backgroundImage: `url(${base64_image})` } : {}}
+    >
       <Dragger
         maxCount={1}
         accept=".png, .jpg, .jpeg"
@@ -32,13 +34,18 @@ const Index: React.FC<Props> = ({ handleOnChange }) => {
           handleUploadOnchange(file as any);
         }}
       >
-        <div className={'tips-wrapper'}>
-          <div className="ant-upload-drag-icon">
-            <img src={UploadImg} alt="" />
-          </div>
-          <p className="ant-upload-text">Drag image here or Select image to upload</p>
-        </div>
+        {base64_image ?
+          (<div></div>
+          ) : (
+            <div className={'tips-wrapper'}>
+              <div className="ant-upload-drag-icon">
+                <img src={UploadImg} alt="" />
+              </div>
+              <p className="ant-upload-text">Drag image here or Select image to upload</p>
+            </div>
+          )}
       </Dragger>
+
     </div>
   );
 };
