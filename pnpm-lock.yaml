@@ -20,6 +20,9 @@ dependencies:
   compressorjs:
     specifier: ^1.2.1
     version: 1.2.1
+  mande:
+    specifier: ^2.0.8
+    version: 2.0.8
   plasmo:
     specifier: ^0.85.2
     version: 0.85.2(postcss@8.4.38)(react-dom@18.2.0)(react@18.2.0)
@@ -4918,6 +4921,10 @@ packages:
       semver: 5.7.2
     dev: false
     optional: true
+
+  /mande@2.0.8:
+    resolution: {integrity: sha512-nqiiaQbswPuHTvkwh8XExhY650qBwSJefyB1+P9Llj8v603aScSrUBmc124fSnVCP+MFZWNBhHKJjsxr7f1tLg==}
+    dev: false
 
   /mdn-data@2.0.14:
     resolution: {integrity: sha512-dn6wd0uw5GsdswPFfsgMp5NSB0/aDe6fK94YJV/AJDYXL6HVLWBsxeq7js7Ad+mU2K9LAlwpk6kN2D5mwCPVow==}

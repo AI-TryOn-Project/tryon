@@ -63,7 +63,9 @@ const App: React.FC = () => {
           }}
           icon={IconSize}
           text='SIZE RECOMMENDATION'
-          onClick={() => { }}
+          onClick={() => {
+            // alert('Please enter all dimensions (Bust, Waist, Hips)');
+          }}
         />
       </div>
     </div>

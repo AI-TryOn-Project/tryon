@@ -21,8 +21,8 @@ const dataSlice = createSlice({
         bust:undefined,
         hips:undefined,
         waist:undefined
-  }
-},
+    }
+  },
   reducers: {
     changeImg(state, action) {
      state.base64_image = action.payload
@@ -35,8 +35,9 @@ const dataSlice = createSlice({
             ...state.body_measurements,
             ...action.payload
         }
-    }
-  }
+    },
+  },
+  // https://juejin.cn/post/7101688098781659172
 })
 
 export const { changeImg,changeBodyMeasurements } = dataSlice.actions

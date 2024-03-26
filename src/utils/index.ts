@@ -37,3 +37,7 @@ export const resizeImg = async (originFile: File, maxSize = 1920): Promise<File>
     const thumbnailDataUrl = await getBase64ByFile(thumbnailFile);
     return { minimizedImg, thumbnailDataUrl };
   }
+
+export function cmToInch(cm:number) {
+    return Math.round(cm / 2.54);
+}

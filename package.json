@@ -18,6 +18,7 @@
     "@reduxjs/toolkit": "2.0.1",
     "antd": "^5.15.3",
     "compressorjs": "^1.2.1",
+    "mande": "^2.0.8",
     "plasmo": "^0.85.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
