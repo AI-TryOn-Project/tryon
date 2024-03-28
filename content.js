@@ -700,13 +700,14 @@ function showHelpfulVidsPopup() {
         </div>
         <div id="vidsContentContainer">
             <div id="vidsVidContentContainer">
-                <p>All Brands Solution</p>
-                <iframe width="300" height="169" src="https://www.youtube.com/embed/yDCsx993bbc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                <p>All-In-One RightClick Sotion</p>
+                <iframe width="300" height="169" src="https://www.youtube.com/embed/hZbgKslDNTE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> 
             </div>
             <hr id="videoSeparator">
             <div id="vidsVidContentContainer">
-                <p>All-In-One RightClick Sotion</p>
-                <iframe width="300" height="169" src="https://www.youtube.com/embed/hZbgKslDNTE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>                </div>
+                <p>All Brands Solution</p>
+                <iframe width="300" height="169" src="https://www.youtube.com/embed/yDCsx993bbc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
         </div>
     </div>`;
     popup.id = "vidsPopup";
