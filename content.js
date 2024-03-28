@@ -700,13 +700,13 @@ function showHelpfulVidsPopup() {
         </div>
         <div id="vidsContentContainer">
             <div id="vidsVidContentContainer">
-                <p>How to use size recommendation across brands?</p>
-                <iframe width="300" height="169" src="https://www.youtube.com/embed/7BGPnZfP2pA?si=EDnmaohLCITeq_v4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                <p>All Brands Solution</p>
+                <iframe width="300" height="169" src="https://www.youtube.com/embed/yDCsx993bbc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
             </div>
             <hr id="videoSeparator">
             <div id="vidsVidContentContainer">
-                <p>All-in-one rightclick virtual tryon</p>
-                <iframe width="300" height="169" src="https://www.youtube.com/embed/FGbJv4Yw9YU?si=BAGrCltmg4g1DVBI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>                </div>
+                <p>All-In-One RightClick Sotion</p>
+                <iframe width="300" height="169" src="https://www.youtube.com/embed/hZbgKslDNTE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>                </div>
         </div>
     </div>`;
     popup.id = "vidsPopup";
