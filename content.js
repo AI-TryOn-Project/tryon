@@ -275,13 +275,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     } else if (message.action === "createOverlay") {
         createOverlay(false);
     } else if (message.action === "processCapturedImage") {
-        cropImage(message.dataUrl, message.selection, message.isSizeChart, message.userDimensions);
+        cropImage(message.dataUrl, message.selection, message.isSizeChart, message.userDimensions, message.tabUrl);
     } else if (message.action === "showHelpfulVids") {
         showHelpfulVidsPopup();
     }
 });
 
-function cropImage(dataUrl, selection, isSizeChart, userDimensions) {
+function cropImage(dataUrl, selection, isSizeChart, userDimensions, tabUrl) {
     const pixelRatio = window.devicePixelRatio || 1;
     const scaleFactor = 0.5; // Reduce the image size to 50% of the original
     const img = new Image();
@@ -305,7 +305,7 @@ function cropImage(dataUrl, selection, isSizeChart, userDimensions) {
         );
         const croppedDataUrl = canvas.toDataURL('image/png');
         if (isSizeChart) {
-            fetchRecommendations(userDimensions, croppedDataUrl);
+            fetchRecommendations(userDimensions, croppedDataUrl, tabUrl);
         } else {
             chrome.runtime.sendMessage({ action: "finishedCrop", croppedDataUrl: croppedDataUrl});
         }
@@ -313,7 +313,7 @@ function cropImage(dataUrl, selection, isSizeChart, userDimensions) {
     img.src = dataUrl;
 }
 
-function fetchRecommendations(bodyMeasurements, base64ScreenShot) {
+function fetchRecommendations(bodyMeasurements, base64ScreenShot, tabUrl) {
     showLoadingPopup('Generating size recommendation for you...');
     const apiUrl = 'https://api.tianlong.co.uk/get-size-recommendation';
 
@@ -321,7 +321,8 @@ function fetchRecommendations(bodyMeasurements, base64ScreenShot) {
     const postData = {
         base64_image: base64ScreenShot,
         body_measurements: bodyMeasurements,
-        showing_chart: true
+        showing_chart: true,
+        tabUrl: tabUrl
     };
 
     fetch(apiUrl, {
@@ -334,7 +335,7 @@ function fetchRecommendations(bodyMeasurements, base64ScreenShot) {
         .then(response => response.json())
         .then(data => {
             console.log(data);
-            createPopup(null, JSON.parse(data), bodyMeasurements)
+            createPopup(null, data, bodyMeasurements)
         })
         .catch(error => console.error('Error:', error))
         .finally(() => {
@@ -419,6 +420,7 @@ function fetchAndRenderSizeChart(currentUrl, pageTitle, srcUrl, pageTitle) {
         })
         .then(data => {
             // This data will now be used in createPopup
+            console.log(data)
             return data;
         })
         .catch(error => {

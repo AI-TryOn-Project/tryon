@@ -35,7 +35,7 @@ chrome.runtime.onInstalled.addListener(() => {
     } else if (message.action === 'finishedCrop') {
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         const currentTab = tabs[0];
-        generateTryOn(message.croppedDataUrl, "https://img.shopcider.com/hermes/video/1681719531000-ehkmff.jpg", currentTab, "https://www.shopcider.com/product/detail?pid=1012906&style_id=112905") // fix me
+        generateTryOn(message.croppedDataUrl, "https://img.shopcider.com/hermes/video/1681719531000-ehkmff.jpg", currentTab, currentTab.url) // fix me
       });
     }
   });
@@ -49,7 +49,8 @@ function captureAndProcessImage(selectionCoordinates, isSizeChart, userDimension
           dataUrl: dataUrl, 
           selection: selectionCoordinates,
           isSizeChart: isSizeChart,
-          userDimensions: userDimensions 
+          userDimensions: userDimensions,
+          tabUrl: currentTab.url 
       });
     });
   });
