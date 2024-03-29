@@ -4,13 +4,19 @@ chrome.runtime.onInstalled.addListener(() => {
       title: "fAIshion Try-On",
       contexts: ["all"]
     });
+
+    chrome.contextMenus.create({
+      id: "recommendSize",
+      title: "Size Recommendation",
+      contexts: ["all"] // This context limits the menu item to images only
+    });
   });
 
   chrome.runtime.onMessage.addListener(async function (message, tab, sendResponse) {
     console.log(message);
     console.log(message.action);
     if (message.action === 'capture') {
-      const base64ScreenShot = await chrome.tabs.captureVisibleTab();
+      // const base64ScreenShot = await chrome.tabs.captureVisibleTab();
       chrome.storage.local.get('bodyDimensions', function(result) {
         const userDimensions = result.bodyDimensions || {};
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
@@ -19,13 +25,13 @@ chrome.runtime.onInstalled.addListener(() => {
               chrome.tabs.sendMessage(currentTab.id, {
                   action: 'getRecommendations',
                   userDimensions: userDimensions,
-                  base64ScreenShot: base64ScreenShot
+                  // base64ScreenShot: base64ScreenShot
               });
           }
         });
       });
     } else if (message.action === 'captureSelectedArea') {
-      captureAndProcessImage(message.coordinates);
+      captureAndProcessImage(message.coordinates, message.isSizeChart, message.userDimensions);
     } else if (message.action === 'finishedCrop') {
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         const currentTab = tabs[0];
@@ -34,14 +40,16 @@ chrome.runtime.onInstalled.addListener(() => {
     }
   });
 
-function captureAndProcessImage(selectionCoordinates) {
+function captureAndProcessImage(selectionCoordinates, isSizeChart, userDimensions) {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     const currentTab = tabs[0];
     chrome.tabs.captureVisibleTab(currentTab.windowId, {format: 'png'}, function(dataUrl) {
         chrome.tabs.sendMessage(currentTab.id, { 
           action: "processCapturedImage", 
           dataUrl: dataUrl, 
-          selection: selectionCoordinates 
+          selection: selectionCoordinates,
+          isSizeChart: isSizeChart,
+          userDimensions: userDimensions 
       });
     });
   });
@@ -113,6 +121,20 @@ function fetchImageAsBase64(url, callback) {
           console.log("no src url, sending createOverlay message to content script")
           chrome.tabs.sendMessage(tab.id, { action: "createOverlay" });
         }
+    } else if (info.menuItemId === "recommendSize") {
+      chrome.storage.local.get('bodyDimensions', function(result) {
+        const userDimensions = result.bodyDimensions || {};
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          const currentTab = tabs[0];
+          if (currentTab) {
+              chrome.tabs.sendMessage(currentTab.id, {
+                  action: 'getRecommendations',
+                  userDimensions: userDimensions,
+                  // base64ScreenShot: base64ScreenShot
+              });
+          }
+        });
+      });
     }
   });
 
