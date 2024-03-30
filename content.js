@@ -270,8 +270,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             });
         rightClickedElement = null; // Reset the right-clicked element
     } else if (message.action === 'getRecommendations') {
-        createOverlay(true, message.userDimensions);
-        // fetchRecommendations(message.userDimensions, message.base64ScreenShot);
+        // createOverlay(true, message.userDimensions);
+        fetchRecommendations(message.userDimensions, message.base64ScreenShot, message.tabUrl);
     } else if (message.action === "createOverlay") {
         createOverlay(false);
     } else if (message.action === "processCapturedImage") {

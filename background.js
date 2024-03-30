@@ -4,19 +4,13 @@ chrome.runtime.onInstalled.addListener(() => {
       title: "fAIshion Try-On",
       contexts: ["all"]
     });
-
-    chrome.contextMenus.create({
-      id: "recommendSize",
-      title: "Size Recommendation",
-      contexts: ["all"] // This context limits the menu item to images only
-    });
   });
 
   chrome.runtime.onMessage.addListener(async function (message, tab, sendResponse) {
     console.log(message);
     console.log(message.action);
     if (message.action === 'capture') {
-      // const base64ScreenShot = await chrome.tabs.captureVisibleTab();
+      const base64ScreenShot = await chrome.tabs.captureVisibleTab();
       chrome.storage.local.get('bodyDimensions', function(result) {
         const userDimensions = result.bodyDimensions || {};
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
@@ -25,7 +19,8 @@ chrome.runtime.onInstalled.addListener(() => {
               chrome.tabs.sendMessage(currentTab.id, {
                   action: 'getRecommendations',
                   userDimensions: userDimensions,
-                  // base64ScreenShot: base64ScreenShot
+                  base64ScreenShot: base64ScreenShot,
+                  tabUrl: currentTab.url,
               });
           }
         });
