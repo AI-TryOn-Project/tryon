@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Last selected tab
-    chrome.storage.local.get('selectedDimTab', function (result) {        
+    chrome.storage.local.get('selectedDimTab', function (result) {
         if (result.selectedDimTab) {
             switchTab(1);
         } else {
@@ -105,6 +105,13 @@ document.getElementById('saveDimBtn').addEventListener('click', function () {
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('#sizeRecomBtn').forEach(function (element) {
         element.addEventListener('click', function () {
+            let bust = document.getElementById('bustInput').value;
+            let waist = document.getElementById('waistInput').value;
+            let hips = document.getElementById('hipsInput').value;
+            if (!bust || !waist || !hips) {
+                alert('Please enter all dimensions (Bust, Waist, Hips)');
+                return;
+            }
             chrome.runtime.sendMessage({ action: 'capture' });
         });
     });
@@ -120,10 +127,10 @@ document.getElementById('uploadBtn').addEventListener('click', function () {
     if (document.getElementById("uploadBtnText").textContent === "CHANGE") {
         preview.classList.add('hidden');
         upload.classList.remove('hidden');
-        document.getElementById("imageUploadLabelPrompt").textContent = "Drag image here or Select image to upload"
+        document.getElementById("imageUploadLabelPrompt").textContent = "Drag image here or Select image to upload";
 
         // Replace upload prompt
-        document.getElementById("imageUploadPrompt").textContent = "Capture your clear, well-lit, frontal facial image for optimal results.";
+        document.getElementById("imageUploadPrompt").textContent = "Clear, well-lit facial image";
 
         // Upload btn -> change btn
         document.getElementById("uploadBtnText").textContent = "UPLOAD";
@@ -131,7 +138,6 @@ document.getElementById('uploadBtn').addEventListener('click', function () {
 
         // Purge selected img
         fileToUpload = undefined;
-
         return;
     }
 
@@ -229,7 +235,7 @@ function switchTab(tabIndex) {
     tabs[tabIndex].classList.add("selected");
 
     // Persist selection
-    chrome.storage.local.set({'selectedDimTab': tabIndex === 1});
+    chrome.storage.local.set({ 'selectedDimTab': tabIndex === 1 });
 }
 
 // Tabbar logic
@@ -262,6 +268,14 @@ document.addEventListener('DOMContentLoaded', function () {
             var windowContentFull = document.getElementById('windowContentFull');
             var windowContentMin = document.getElementById('windowContentMin');
 
+            // validation
+            let bust = document.getElementById('bustInput').value;
+            let waist = document.getElementById('waistInput').value;
+            let hips = document.getElementById('hipsInput').value;
+            if (!bust || !waist || !hips) {
+                alert('Please enter all dimensions (Bust, Waist, Hips)');
+                return;
+            }
             if (document.body.style.height === "260px" || !document.body.style.height) {
                 // Window size 260px/78px
                 document.body.style.height = "78px";
