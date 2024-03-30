@@ -713,7 +713,7 @@ function showHelpfulVidsPopup() {
         </div>
         <div id="vidsContentContainer">
             <div id="vidsVidContentContainer">
-                <p>All-In-One RightClick Sotion</p>
+                <p>All-In-One RightClick Solution</p>
                 <iframe width="300" height="169" src="https://www.youtube.com/embed/hZbgKslDNTE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> 
             </div>
             <hr id="videoSeparator">
