@@ -270,12 +270,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             });
         rightClickedElement = null; // Reset the right-clicked element
     } else if (message.action === 'getRecommendations') {
-        showLoadingPopup('Generating AI size recommendations, Please Wait...');
-        fetchRecommendations(message.userDimensions, message.base64ScreenShot);
+        // createOverlay(true, message.userDimensions);
+        fetchRecommendations(message.userDimensions, message.base64ScreenShot, message.tabUrl);
     } else if (message.action === "createOverlay") {
-        createOverlay();
+        createOverlay(false);
     } else if (message.action === "processCapturedImage") {
-        cropImage(message.dataUrl, message.selection);
+        cropImage(message.dataUrl, message.selection, message.isSizeChart, message.userDimensions, message.tabUrl);
     } else if (message.action === "showHelpfulVids") {
 
         // 检查页面中是否已经出现了弹窗, 如果出现了不再重复弹出;
@@ -286,37 +286,48 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 });
 
-function cropImage(dataUrl, selection) {
+function cropImage(dataUrl, selection, isSizeChart, userDimensions, tabUrl) {
     const pixelRatio = window.devicePixelRatio || 1;
+    const scaleFactor = 0.5; // Reduce the image size to 50% of the original
     const img = new Image();
     img.onload = function () {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = selection.width * pixelRatio;
-        canvas.height = selection.height * pixelRatio;
+        
+        // Apply the scale factor to the canvas dimensions
+        canvas.width = selection.width * pixelRatio * scaleFactor;
+        canvas.height = selection.height * pixelRatio * scaleFactor;
+
         ctx.drawImage(img,
-            selection.x * pixelRatio,
-            selection.y * pixelRatio,
-            selection.width * pixelRatio,
-            selection.height * pixelRatio,
-            0, 0,
-            selection.width * pixelRatio,
-            selection.height * pixelRatio
+            selection.x * pixelRatio, // Source X
+            selection.y * pixelRatio, // Source Y
+            selection.width * pixelRatio, // Source Width
+            selection.height * pixelRatio, // Source Height
+            0, // Destination X
+            0, // Destination Y
+            selection.width * pixelRatio * scaleFactor, // Destination Width
+            selection.height * pixelRatio * scaleFactor // Destination Height
         );
         const croppedDataUrl = canvas.toDataURL('image/png');
-        chrome.runtime.sendMessage({ action: "finishedCrop", croppedDataUrl: croppedDataUrl });
+        if (isSizeChart) {
+            fetchRecommendations(userDimensions, croppedDataUrl, tabUrl);
+        } else {
+            chrome.runtime.sendMessage({ action: "finishedCrop", croppedDataUrl: croppedDataUrl});
+        }
     };
     img.src = dataUrl;
 }
 
-function fetchRecommendations(bodyMeasurements, base64ScreenShot) {
+function fetchRecommendations(bodyMeasurements, base64ScreenShot, tabUrl) {
+    showLoadingPopup('Generating size recommendation for you...');
     const apiUrl = 'https://api.tianlong.co.uk/get-size-recommendation';
 
     // Prepare the data to be sent in the POST request
     const postData = {
         base64_image: base64ScreenShot,
         body_measurements: bodyMeasurements,
-        showing_chart: true
+        showing_chart: true,
+        tabUrl: tabUrl
     };
 
     fetch(apiUrl, {
@@ -329,7 +340,7 @@ function fetchRecommendations(bodyMeasurements, base64ScreenShot) {
         .then(response => response.json())
         .then(data => {
             console.log(data);
-            createPopup(null, JSON.parse(data), bodyMeasurements);
+            createPopup(null, data, bodyMeasurements)
         })
         .catch(error => console.error('Error:', error))
         .finally(() => {
@@ -414,6 +425,7 @@ function fetchAndRenderSizeChart(currentUrl, pageTitle, srcUrl, pageTitle) {
         })
         .then(data => {
             // This data will now be used in createPopup
+            console.log(data)
             return data;
         })
         .catch(error => {
@@ -478,7 +490,7 @@ function hideLoadingPopup() {
     }
 }
 
-function createOverlay() {
+function createOverlay(isSizeChart, userDimensions) {
     console.log("creating overlay");
     selectionBox = null;
     isSelecting = true;
@@ -491,13 +503,15 @@ function createOverlay() {
     overlay.style.height = '100vh';
     overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
     overlay.style.cursor = 'crosshair';
-    overlay.style.zIndex = '9999';
+    overlay.style.zIndex = '99999999';
     overlay.style.clipPath = 'inset(0)'; // Initially no clipping
     document.body.appendChild(overlay);
 
     overlay.addEventListener('mousedown', startSelection);
     overlay.addEventListener('mousemove', resizeSelection);
-    overlay.addEventListener('mouseup', endSelection);
+    overlay.addEventListener('mouseup', function(event) {
+        endSelection(event, isSizeChart, userDimensions);
+    });
     document.addEventListener('keydown', cancelSelection); // Add keydown listener
 }
 
@@ -557,7 +571,8 @@ function resizeSelection(event) {
 }
 
 
-function endSelection() {
+async function endSelection(event, isSizeChart, userDimensions) {
+    console.log(isSizeChart)
     if (selectionBox) {
         overlay.removeEventListener('mousedown', startSelection);
         overlay.removeEventListener('mousemove', resizeSelection);
@@ -570,9 +585,7 @@ function endSelection() {
             height: parseInt(selectionBox.style.height, 10)
         };
 
-        // Send coordinates to background script
-        chrome.runtime.sendMessage({ action: "captureSelectedArea", coordinates: selectionCoordinates });
-
+        chrome.runtime.sendMessage({ action: "captureSelectedArea", coordinates: selectionCoordinates, isSizeChart: isSizeChart, userDimensions: userDimensions}); 
         // Clean up
         overlay.remove();
         isSelecting = false;

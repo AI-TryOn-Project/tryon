@@ -19,29 +19,33 @@ chrome.runtime.onInstalled.addListener(() => {
               chrome.tabs.sendMessage(currentTab.id, {
                   action: 'getRecommendations',
                   userDimensions: userDimensions,
-                  base64ScreenShot: base64ScreenShot
+                  base64ScreenShot: base64ScreenShot,
+                  tabUrl: currentTab.url,
               });
           }
         });
       });
     } else if (message.action === 'captureSelectedArea') {
-      captureAndProcessImage(message.coordinates);
+      captureAndProcessImage(message.coordinates, message.isSizeChart, message.userDimensions);
     } else if (message.action === 'finishedCrop') {
       chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         const currentTab = tabs[0];
-        generateTryOn(message.croppedDataUrl, "https://img.shopcider.com/hermes/video/1681719531000-ehkmff.jpg", currentTab, "https://www.shopcider.com/product/detail?pid=1012906&style_id=112905") // fix me
+        generateTryOn(message.croppedDataUrl, "https://img.shopcider.com/hermes/video/1681719531000-ehkmff.jpg", currentTab, currentTab.url) // fix me
       });
     }
   });
 
-function captureAndProcessImage(selectionCoordinates) {
+function captureAndProcessImage(selectionCoordinates, isSizeChart, userDimensions) {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     const currentTab = tabs[0];
     chrome.tabs.captureVisibleTab(currentTab.windowId, {format: 'png'}, function(dataUrl) {
         chrome.tabs.sendMessage(currentTab.id, { 
           action: "processCapturedImage", 
           dataUrl: dataUrl, 
-          selection: selectionCoordinates 
+          selection: selectionCoordinates,
+          isSizeChart: isSizeChart,
+          userDimensions: userDimensions,
+          tabUrl: currentTab.url 
       });
     });
   });
@@ -113,6 +117,20 @@ function fetchImageAsBase64(url, callback) {
           console.log("no src url, sending createOverlay message to content script")
           chrome.tabs.sendMessage(tab.id, { action: "createOverlay" });
         }
+    } else if (info.menuItemId === "recommendSize") {
+      chrome.storage.local.get('bodyDimensions', function(result) {
+        const userDimensions = result.bodyDimensions || {};
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          const currentTab = tabs[0];
+          if (currentTab) {
+              chrome.tabs.sendMessage(currentTab.id, {
+                  action: 'getRecommendations',
+                  userDimensions: userDimensions,
+                  // base64ScreenShot: base64ScreenShot
+              });
+          }
+        });
+      });
     }
   });
 
