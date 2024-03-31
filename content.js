@@ -450,6 +450,15 @@ function showLoadingPopup(loadingText) {
     loadingPopup.style.flexDirection = 'column';
     loadingPopup.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
 
+    // Spinner container to center text inside the spinner
+    const spinnerContainer = document.createElement('div');
+    spinnerContainer.style.position = 'relative';
+    spinnerContainer.style.display = 'flex';
+    spinnerContainer.style.justifyContent = 'center';
+    spinnerContainer.style.alignItems = 'center';
+    spinnerContainer.style.width = '50px'; // Match spinner size
+    spinnerContainer.style.height = '50px'; // Match spinner size
+
     const spinner = document.createElement('div');
     spinner.style.border = '5px solid #f3f3f3';
     spinner.style.borderTop = '5px solid #3498db';
@@ -458,12 +467,25 @@ function showLoadingPopup(loadingText) {
     spinner.style.height = '50px';
     spinner.style.animation = 'spin 1s linear infinite';
 
+    // Create a div for the progress text
+    const progressText = document.createElement('div');
+    progressText.style.position = 'absolute'; // Position text over spinner
+    progressText.textContent = '0%'; // Initial progress
+    progressText.style.fontWeight = 'bold';
+
+
     const spinnerText = document.createElement('div');
     spinnerText.textContent = loadingText;
     spinnerText.style.marginTop = '10px';
 
-    loadingPopup.appendChild(spinner);
+
+
+    spinnerContainer.appendChild(spinner);
+    spinnerContainer.appendChild(progressText); // Add progress text inside the spinner container
+
+    loadingPopup.appendChild(spinnerContainer); // Add spinner container to the popup
     loadingPopup.appendChild(spinnerText);
+
     document.body.appendChild(loadingPopup);
 
     // Add the @keyframes for the spinner
@@ -474,8 +496,19 @@ function showLoadingPopup(loadingText) {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
       }
-  `;
+    `;
     document.head.appendChild(styleSheet);
+
+    // Simulate progress update
+    let progress = 0;
+    const intervalId = setInterval(() => {
+        progress += 1;
+        progressText.textContent = `${progress}%`;
+
+        if (progress >= 100) {
+            clearInterval(intervalId);
+        }
+    }, (10 * 1000) / 100); // Adjust the timing as needed
 }
 
 // Function to hide the loading popup

@@ -35,7 +35,7 @@ chrome.runtime.onInstalled.addListener(() => {
     }else if (message.action === "injectScript") {
       chrome.scripting.executeScript({
           target: {tabId: message.tabId},
-          files: ['showHelpfulVideos.js']
+          files: ['content/showHelpfulVideos.js']
       }).then(() => {
           console.log("Content script has been injected.");
       }).catch(err => console.error(err));
