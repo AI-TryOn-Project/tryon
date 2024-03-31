@@ -505,7 +505,7 @@ function showLoadingPopup(loadingText) {
         progress += 1;
         progressText.textContent = `${progress}%`;
 
-        if (progress >= 100) {
+        if (progress >= 99) {
             clearInterval(intervalId);
         }
     }, (10 * 1000) / 100); // Adjust the timing as needed
