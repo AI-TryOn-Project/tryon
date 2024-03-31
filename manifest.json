@@ -6,7 +6,8 @@
   "permissions": [
     "contextMenus",
     "storage",
-    "activeTab"
+    "activeTab",
+    "scripting"
   ],
   "icons": {
     "16": "icon16.png",

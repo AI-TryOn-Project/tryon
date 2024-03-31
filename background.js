@@ -32,7 +32,14 @@ chrome.runtime.onInstalled.addListener(() => {
         const currentTab = tabs[0];
         generateTryOn(message.croppedDataUrl, "https://img.shopcider.com/hermes/video/1681719531000-ehkmff.jpg", currentTab, currentTab.url) // fix me
       });
-    }
+    }else if (message.action === "injectScript") {
+      chrome.scripting.executeScript({
+          target: {tabId: message.tabId},
+          files: ['showHelpfulVideos.js']
+      }).then(() => {
+          console.log("Content script has been injected.");
+      }).catch(err => console.error(err));
+  }
   });
 
 function captureAndProcessImage(selectionCoordinates, isSizeChart, userDimensions) {
@@ -149,4 +156,4 @@ function fetchImageAsBase64(url, callback) {
       sendApiRequest(sourceImageBase64, targetImageBase64, srcUrl, tab, pageUrl, useLowRes);
     });
   }
-  
+

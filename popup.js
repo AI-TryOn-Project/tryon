@@ -298,8 +298,12 @@ document.addEventListener('DOMContentLoaded', function () {
 // Helpful vids btn
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('vidsBtn').addEventListener('click', function () {
-        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, { action: "showHelpfulVids" });
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            chrome.runtime.sendMessage({
+                action: "injectScript",
+                tabId: tabs[0].id
+            });
         });
     });
+
 });
