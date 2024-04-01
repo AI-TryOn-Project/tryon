@@ -275,7 +275,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         showLoadingPopup('Generating Virtual Try-On, Please Wait...');
     }
     else if (message.action === 'replaceImage') {
-        hideLoadingPopup();
+        // hideLoadingPopup();
 
         fetchAndRenderSizeChart(message.productUrl, message.pageTitle, message.srcUrl, message.pageTitle)
             .then(sizeChartData => {
@@ -404,7 +404,7 @@ function createAndShowTextPopup(dataHtml) {
 
 
 function fetchAndRenderSizeChart(currentUrl, pageTitle, srcUrl, pageTitle) {
-    showLoadingPopup('Generating size recommendation for you...');
+    // showLoadingPopup('Generating size recommendation for you...');
     const apiUrl = 'https://api.tianlong.co.uk/get-size-guide';
 
     // Prepare the data to be sent in the POST request
