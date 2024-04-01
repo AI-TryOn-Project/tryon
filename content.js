@@ -2,6 +2,7 @@ let rightClickedElement = null;
 let isSelecting = false;
 let startX, startY, endX, endY;
 let overlay, selectionBox;
+let progress = 0;
 
 document.addEventListener('contextmenu', (event) => {
     // Check if the clicked element is an image
@@ -20,6 +21,16 @@ function addStyles() {
         color: #856404; /* darker text color for better contrast */
         padding: 5px;
         border-radius: 4px; /* rounded corners */
+      }
+      .closeButton_faishion {
+        background-color: rgb(255, 255, 255);
+        font-family: "Roboto", sans-serif;
+        top: 10px;
+        right: 10px;
+        border: solid 0.5px #000;
+        cursor: pointer;
+        border-radius: 2px;
+        padding:1px 2px;
       }
   `;
     document.head.appendChild(styleElement);
@@ -157,8 +168,10 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
     closeButton.onclick = function () {
         document.body.removeChild(popupContainer);
     };
+    closeButton.className = 'closeButton_faishion'
     closeButton.style.position = 'absolute';
-    closeButton.style.bottom = '10px';
+
+    closeButton.style.top = '10px';
     closeButton.style.right = '10px';
 
     // Append the close button to the popup
@@ -372,6 +385,8 @@ function createAndShowTextPopup(dataHtml) {
     // Create a close button
     const closeButton = document.createElement('button');
     closeButton.textContent = 'Close';
+    closeButton.className = 'closeButton_faishion'
+
     closeButton.style.position = 'absolute';
     closeButton.style.top = '10px';
     closeButton.style.right = '10px';
@@ -500,7 +515,6 @@ function showLoadingPopup(loadingText) {
     document.head.appendChild(styleSheet);
 
     // Simulate progress update
-    let progress = 0;
     const intervalId = setInterval(() => {
         progress += 1;
         progressText.textContent = `${progress}%`;
@@ -513,9 +527,13 @@ function showLoadingPopup(loadingText) {
 
 // Function to hide the loading popup
 function hideLoadingPopup() {
+    progress = 99
     const loadingPopup = document.getElementById('my-extension-loading-popup');
     if (loadingPopup) {
-        document.body.removeChild(loadingPopup);
+        setTimeout(()=>{
+            document.body.removeChild(loadingPopup);
+            progress = 0
+        },250)
     }
 }
 

@@ -115,6 +115,7 @@ function fetchImageAsBase64(url, callback) {
   
   // Example usage: Convert right-clicked image to base64 and call API
   chrome.contextMenus.onClicked.addListener((info, tab) => {
+    console.log('sssssssss')
     if (info.menuItemId === "viewImage") {
         if(info.srcUrl) {
           fetchImageAsBase64(info.srcUrl, (targetImageBase64) => {
@@ -152,7 +153,7 @@ function fetchImageAsBase64(url, callback) {
         alert("Please upload an image in the extension before proceeding.");
         return; // Exit the function if no image is set
       }
-       
+      console.log('hhhhhhhhhhhhhhhhhhhhh')
       sendApiRequest(sourceImageBase64, targetImageBase64, srcUrl, tab, pageUrl, useLowRes);
     });
   }
