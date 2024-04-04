@@ -143,12 +143,8 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
             });
             sizeChartTable.appendChild(dataRow);
         });
-
         // Append the size chart table to its container
         sizeChartContainer.appendChild(sizeChartTable);
-        if (imageBase64) {
-            sizeChartContainer.appendChild(message);
-        }
     } else {
 
         // Fallback message when size chart is not available

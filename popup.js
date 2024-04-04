@@ -60,11 +60,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
     chrome.storage.local.get('measurementUnit', function (result) {
-        if (result.measurementUnit === 'in') {
+        if (result.measurementUnit === 'in'||!result.measurementUnit) {
             var element = document.getElementById("dim-switch-btn");
             element.classList.add("dim-in-switch-selected");
               // Update labels for all textfields
-        } else {
         }
         changeDimLabel(result.measurementUnit)
     });
