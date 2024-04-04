@@ -474,6 +474,7 @@ function showLoadingPopup(loadingText) {
     spinner.style.borderTop = '5px solid #3498db';
     spinner.style.borderRadius = '50%';
     spinner.style.width = '40px';
+    spinner.style.boxSizing = 'content-box';
     spinner.style.height = '40px';
     spinner.style.animation = 'spin 1s linear infinite';
 
