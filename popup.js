@@ -14,6 +14,12 @@ function inchToCm(inches) {
 let storedInDim = []
 let storedCmDim = []
 
+function changeDimLabel(option){
+    let labels = document.querySelectorAll(".tab-content-body-dim-text-label");
+    labels.forEach(label => {
+        label.textContent = option;
+    });
+}
 // Update the file name display function remains the same
 function updateFileNameDisplay(fileName) {
     // Crop the file name if it's too long
@@ -57,9 +63,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (result.measurementUnit === 'in') {
             var element = document.getElementById("dim-switch-btn");
             element.classList.add("dim-in-switch-selected");
+              // Update labels for all textfields
         } else {
-          
         }
+        changeDimLabel(result.measurementUnit)
     });
     // Last selected tab
     chrome.storage.local.get('selectedDimTab', function (result) {
@@ -275,10 +282,7 @@ document.getElementById("dim-switch-btn").addEventListener("click", function () 
     let option = this.classList.contains("dim-in-switch-selected") ? "in" : "cm";
 
     // Update labels for all textfields
-    let labels = document.querySelectorAll(".tab-content-body-dim-text-label");
-    labels.forEach(label => {
-        label.textContent = option;
-    });
+    changeDimLabel(option)
     //  Update input for all textfields
     let inputs = document.querySelectorAll(".tab-content-body-dim-text-field");
     let measurementUnit = document.querySelector('.tab-content-body-dim-text-label').textContent;
