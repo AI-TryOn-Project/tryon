@@ -50,11 +50,11 @@ function showHelpfulVidsPopup() {
     }
     
     #vidsTitleContainer p {
-        font-family: "Bai Jamjuree", sans-serif;
+        font-family: "Bai Jamjuree", sans-serif !important;
         font-weight: 600;
         font-style: normal;
         font-size: 22px;
-    
+        color: #000 !important;
         margin-top: 20px;
         margin-bottom: 40px;
     }
@@ -73,8 +73,9 @@ function showHelpfulVidsPopup() {
     }
     
     #vidsVidContentContainer p {
-        font-family: "Bai Jamjuree", sans-serif;
+        font-family: "Bai Jamjuree", sans-serif !important;
         font-weight: 200;
+        color: #000 !important;
         font-style: normal;
         font-size: 18px;
         width: 230px;
