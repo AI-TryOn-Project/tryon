@@ -111,7 +111,7 @@ document.getElementById('saveDimBtn').addEventListener('click', function () {
     // Save to local storage
     chrome.storage.local.set({
         'bodyDimensions': { bust, waist, hips }, // for UI
-        'bodyDimensionsIn':{bust:bustIn,waist:waistIn,hips:hipsIn},// only for service
+        'bodyDimensionsIn':{bust:bustIn,waist:waistIn,hips:hipsIn},// only for server
         'measurementUnit':measurementUnit
     }, function () {
         if (chrome.runtime.lastError) {
