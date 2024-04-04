@@ -487,11 +487,13 @@ function showLoadingPopup(loadingText) {
     progressText.style.position = 'absolute'; // Position text over spinner
     progressText.textContent = '0%'; // Initial progress
     progressText.style.fontWeight = 'bold';
+    progressText.style.color = '#000';
 
 
     const spinnerText = document.createElement('div');
     spinnerText.textContent = loadingText;
     spinnerText.style.marginTop = '10px';
+    spinnerText.style.color = '#000';
 
 
 
