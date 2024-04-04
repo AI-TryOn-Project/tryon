@@ -11,8 +11,8 @@ chrome.runtime.onInstalled.addListener(() => {
     console.log(message.action);
     if (message.action === 'capture') {
       const base64ScreenShot = await chrome.tabs.captureVisibleTab();
-      chrome.storage.local.get('bodyDimensions', function(result) {
-        const userDimensions = result.bodyDimensions || {};
+      chrome.storage.local.get('bodyDimensionsIn', function(result) {
+        const userDimensions = result.bodyDimensionsIn || {};
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
           const currentTab = tabs[0];
           if (currentTab) {
@@ -95,8 +95,8 @@ function fetchImageAsBase64(url, callback) {
       const imageBase64 = data.image;
       console.log("finished processubg")
 
-      chrome.storage.local.get('bodyDimensions', function(result) {
-          const userDimensions = result.bodyDimensions || {};
+      chrome.storage.local.get('bodyDimensionsIn', function(result) {
+          const userDimensions = result.bodyDimensionsIn || {};
           chrome.tabs.sendMessage(tab.id, {
             action: 'replaceImage',
             srcUrl: lastRightClickedImageSrc,
@@ -126,8 +126,8 @@ function fetchImageAsBase64(url, callback) {
           chrome.tabs.sendMessage(tab.id, { action: "createOverlay" });
         }
     } else if (info.menuItemId === "recommendSize") {
-      chrome.storage.local.get('bodyDimensions', function(result) {
-        const userDimensions = result.bodyDimensions || {};
+      chrome.storage.local.get('bodyDimensionsIn', function(result) {
+        const userDimensions = result.bodyDimensionsIn || {};
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
           const currentTab = tabs[0];
           if (currentTab) {

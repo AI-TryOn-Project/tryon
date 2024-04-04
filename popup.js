@@ -85,10 +85,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Save new values
 document.getElementById('saveDimBtn').addEventListener('click', function () {
-    let bust = document.getElementById('bustInput').value;
-    let waist = document.getElementById('waistInput').value;
-    let hips = document.getElementById('hipsInput').value;
     let measurementUnit = document.querySelector('.tab-content-body-dim-text-label').textContent;
+    const isInch = measurementUnit === 'in'
+    let bust = document.getElementById('bustInput').value;
+    let bustIn = isInch ? bust : cmToInch(bust)
+    let waist = document.getElementById('waistInput').value;
+    let waistIn = isInch ? waist : cmToInch(waist)
+    let hips = document.getElementById('hipsInput').value;
+    let hipsIn = isInch ? hips : cmToInch(hips)
+
 
     // Validation
     if (!bust || !waist || !hips) {
@@ -105,7 +110,8 @@ document.getElementById('saveDimBtn').addEventListener('click', function () {
 
     // Save to local storage
     chrome.storage.local.set({
-        'bodyDimensions': { bust, waist, hips },
+        'bodyDimensions': { bust, waist, hips }, // for UI
+        'bodyDimensionsIn':{bust:bustIn,waist:waistIn,hips:hipsIn},// only for service
         'measurementUnit':measurementUnit
     }, function () {
         if (chrome.runtime.lastError) {
@@ -290,10 +296,10 @@ document.getElementById("dim-switch-btn").addEventListener("click", function () 
         });
         let preValue = input.value
         if(measurementUnit === 'in'){
-            input.value =storedCmDim[index]|| inchToCm(preValue)
+            input.value =storedCmDim[index]|| cmToInch(preValue)
             storedInDim[index] = preValue
         }else{
-            input.value =storedInDim[index]|| cmToInch(preValue)
+            input.value =storedInDim[index]|| inchToCm(preValue)
             storedCmDim[index] = preValue
         }
     });
