@@ -374,8 +374,8 @@ body {
   font-size: 8px;
 }
 
-#dim-switch-btn.dim-switch-selected #dim-switch-option-in,
-#dim-switch-btn:not(.dim-switch-selected) #dim-switch-option-cm {
+#dim-switch-btn.dim-in-switch-selected #dim-switch-option-in,
+#dim-switch-btn:not(.dim-in-switch-selected) #dim-switch-option-cm {
   background-color: #0056B4;
   color: #fff;
 }
@@ -386,6 +386,7 @@ body {
   text-align: center;
   line-height: 14px;
   transition: background-color 0.3s;
+  user-select: none;
 }
 
 /* Mini window styles */

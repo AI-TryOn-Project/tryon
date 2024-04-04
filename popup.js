@@ -5,8 +5,14 @@ let fileToUpload;
 /* Helpers start */
 // Utility function to convert cm to inches
 function cmToInch(cm) {
-    return Math.round(cm / 2.54);
+    return Math.round(Number(cm) / 2.54);
 }
+function inchToCm(inches) {
+    return Math.round(Number(inches) * 2.54 ) 
+}
+
+let storedInDim = []
+let storedCmDim = []
 
 // Update the file name display function remains the same
 function updateFileNameDisplay(fileName) {
@@ -47,7 +53,14 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('hipsInput').value = result.bodyDimensions.hips || '';
         }
     });
-
+    chrome.storage.local.get('measurementUnit', function (result) {
+        if (result.measurementUnit === 'in') {
+            var element = document.getElementById("dim-switch-btn");
+            element.classList.add("dim-in-switch-selected");
+        } else {
+          
+        }
+    });
     // Last selected tab
     chrome.storage.local.get('selectedDimTab', function (result) {
         if (result.selectedDimTab) {
@@ -84,15 +97,16 @@ document.getElementById('saveDimBtn').addEventListener('click', function () {
     }
 
     // Convert values if the unit is cm
-    if (measurementUnit === 'cm') {
-        bust = cmToInch(parseFloat(bust));
-        waist = cmToInch(parseFloat(waist));
-        hips = cmToInch(parseFloat(hips));
-    }
+    // if (measurementUnit === 'cm') {
+    //     bust = cmToInch(parseFloat(bust));
+    //     waist = cmToInch(parseFloat(waist));
+    //     hips = cmToInch(parseFloat(hips));
+    // }
 
     // Save to local storage
     chrome.storage.local.set({
-        'bodyDimensions': { bust, waist, hips }
+        'bodyDimensions': { bust, waist, hips },
+        'measurementUnit':measurementUnit
     }, function () {
         if (chrome.runtime.lastError) {
             alert('An error occurred: ' + chrome.runtime.lastError.message);
@@ -250,16 +264,40 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // Dim switch
-// document.getElementById("dim-switch-btn").addEventListener("click", function () {
-//     this.classList.toggle("dim-switch-selected");
-//     let option = this.classList.contains("dim-switch-selected") ? "in" : "cm";
+document.getElementById("dim-switch-btn").addEventListener("click", function () {
+    this.classList.toggle("dim-in-switch-selected");
+    let option = this.classList.contains("dim-in-switch-selected") ? "in" : "cm";
 
-//     // Update labels for all textfields
-//     let labels = document.querySelectorAll(".tab-content-body-dim-text-label");
-//     labels.forEach(label => {
-//         label.textContent = option;
-//     });
-// });
+    // Update labels for all textfields
+    let labels = document.querySelectorAll(".tab-content-body-dim-text-label");
+    labels.forEach(label => {
+        label.textContent = option;
+    });
+    //  Update input for all textfields
+    let inputs = document.querySelectorAll(".tab-content-body-dim-text-field");
+    let measurementUnit = document.querySelector('.tab-content-body-dim-text-label').textContent;
+    
+
+    inputs.forEach((input,index) => {
+        input.addEventListener('input', function() {
+            if (option === 'in') {
+                // User is inputting data in inches, clear the corresponding cm value
+                storedCmDim[index] = undefined;
+            } else {
+                // User is inputting data in cm, clear the corresponding inch value
+                storedInDim[index] = undefined;
+            }
+        });
+        let preValue = input.value
+        if(measurementUnit === 'in'){
+            input.value =storedCmDim[index]|| inchToCm(preValue)
+            storedInDim[index] = preValue
+        }else{
+            input.value =storedInDim[index]|| cmToInch(preValue)
+            storedCmDim[index] = preValue
+        }
+    });
+});
 
 // Minimize logic
 document.addEventListener('DOMContentLoaded', function () {
