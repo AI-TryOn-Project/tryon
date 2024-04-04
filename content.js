@@ -106,6 +106,7 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
         const sizeChartTable = document.createElement('table');
         sizeChartTable.id = 'sizeChartTable';
         sizeChartTable.style.width = '100%';
+        sizeChartTable.style.marginTop = '25px';
         sizeChartTable.style.borderCollapse = 'collapse';
 
         // Function to reorder keys with 'Size' as the first key
@@ -122,6 +123,7 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
             headerCell.textContent = key;
             headerCell.style.border = '1px solid black';
             headerCell.style.padding = '5px';
+            headerCell.style.color = '#000';
             headerRow.appendChild(headerCell);
         });
         sizeChartTable.appendChild(headerRow);
@@ -135,6 +137,8 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
                 dataCell.textContent = value;
                 dataCell.style.border = '1px solid black';
                 dataCell.style.padding = '5px';
+                dataCell.style.color = '#000';
+
                 dataRow.appendChild(dataCell);
             });
             sizeChartTable.appendChild(dataRow);
@@ -142,8 +146,6 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
 
         // Append the size chart table to its container
         sizeChartContainer.appendChild(sizeChartTable);
-        const message = document.createElement('p');
-        message.textContent = "Inaccurate or outdated size chart? Use our plugin to take the current size chart and see our size recommendation.";
         if (imageBase64) {
             sizeChartContainer.appendChild(message);
         }
@@ -468,9 +470,6 @@ function showLoadingPopup(loadingText) {
     // Spinner container to center text inside the spinner
     const spinnerContainer = document.createElement('div');
     spinnerContainer.style.position = 'relative';
-    spinnerContainer.style.display = 'flex';
-    spinnerContainer.style.justifyContent = 'center';
-    spinnerContainer.style.alignItems = 'center';
     spinnerContainer.style.width = '50px'; // Match spinner size
     spinnerContainer.style.height = '50px'; // Match spinner size
 
@@ -478,13 +477,16 @@ function showLoadingPopup(loadingText) {
     spinner.style.border = '5px solid #f3f3f3';
     spinner.style.borderTop = '5px solid #3498db';
     spinner.style.borderRadius = '50%';
-    spinner.style.width = '50px';
-    spinner.style.height = '50px';
+    spinner.style.width = '40px';
+    spinner.style.height = '40px';
     spinner.style.animation = 'spin 1s linear infinite';
 
     // Create a div for the progress text
     const progressText = document.createElement('div');
     progressText.style.position = 'absolute'; // Position text over spinner
+    progressText.style.top = '50%'; // Position text over spinner
+    progressText.style.left = '50%'; // Position text over spinner
+    progressText.style.transform = 'translate(-50%,-50%)'; // Position text over spinner
     progressText.textContent = '0%'; // Initial progress
     progressText.style.fontWeight = 'bold';
     progressText.style.color = '#000';
@@ -492,7 +494,9 @@ function showLoadingPopup(loadingText) {
 
     const spinnerText = document.createElement('div');
     spinnerText.textContent = loadingText;
+    
     spinnerText.style.marginTop = '10px';
+    spinnerText.style.textTransform = 'none';
     spinnerText.style.color = '#000';
 
 
