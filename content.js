@@ -354,7 +354,6 @@ function fetchRecommendations(bodyMeasurements, base64ScreenShot, tabUrl) {
             hideLoadingPopup(); // Hide the loading popup regardless of the outcome
         });
 }
-
 function createAndShowTextPopup(dataHtml) {
 
     const cleanedDataHtml = dataHtml.replace(/^```html ,|```$/g, '').trim();
@@ -399,7 +398,6 @@ function createAndShowTextPopup(dataHtml) {
     // Append the popup container to the body
     document.body.appendChild(popupContainer);
 }
-
 
 function fetchAndRenderSizeChart(currentUrl, pageTitle, srcUrl, pageTitle) {
     // showLoadingPopup('Generating size recommendation for you...');

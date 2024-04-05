@@ -48,15 +48,16 @@ function renderImgUploadedUI() {
     document.getElementById("uploadBtnIcon").src = "resources/icon-upload-change.svg";
 }
 /* Helpers end */
-
 /* Lifecycle methods start */
 document.addEventListener('DOMContentLoaded', function () {
+    let bodyDimensions = {}
     // Fetch and display existing values
     chrome.storage.local.get('bodyDimensions', function (result) {
         if (result.bodyDimensions) {
             document.getElementById('bustInput').value = result.bodyDimensions.bust || '';
             document.getElementById('waistInput').value = result.bodyDimensions.waist || '';
             document.getElementById('hipsInput').value = result.bodyDimensions.hips || '';
+            bodyDimensions = result.bodyDimensions
         }
     });
     chrome.storage.local.get('measurementUnit', function (result) {
@@ -64,6 +65,13 @@ document.addEventListener('DOMContentLoaded', function () {
             var element = document.getElementById("dim-switch-btn");
             element.classList.add("dim-in-switch-selected");
               // Update labels for all textfields
+
+            // old version has no measurementUnit,all is inch,store bodyDimensions as bodyDimensionsIn
+            if(!result.measurementUnit){
+                chrome.storage.local.set({
+                    'bodyDimensionsIn':bodyDimensions,
+                })
+            }
         }
         changeDimLabel(result.measurementUnit)
     });
@@ -348,9 +356,10 @@ document.addEventListener('DOMContentLoaded', function () {
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
             chrome.runtime.sendMessage({
                 action: "injectScript",
-                tabId: tabs[0].id
+                tabId: tabs[0].id,
             });
         });
     });
 
 });
+

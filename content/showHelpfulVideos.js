@@ -152,4 +152,4 @@ function showHelpfulVidsPopup() {
     vidsPopupBG.appendChild(popup);
 
     document.body.appendChild(vidsPopupBG);
-};
+}
