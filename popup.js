@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // Save new values
 document.getElementById('saveDimBtn').addEventListener('click', function () {
     let measurementUnit = document.querySelector('.tab-content-body-dim-text-label').textContent;
-    const isInch = measurementUnit === 'in'
+    const isInch = measurementUnit === 'in' || !measurementUnit
     let bust = document.getElementById('bustInput').value;
     let bustIn = isInch ? bust : cmToInch(bust)
     let waist = document.getElementById('waistInput').value;
