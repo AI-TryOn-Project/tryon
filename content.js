@@ -124,6 +124,7 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
             headerCell.style.border = '1px solid black';
             headerCell.style.padding = '5px';
             headerCell.style.color = '#000';
+            headerCell.style.fontFamily = 'sans-serif';
             headerRow.appendChild(headerCell);
         });
         sizeChartTable.appendChild(headerRow);
@@ -138,7 +139,8 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
                 dataCell.style.border = '1px solid black';
                 dataCell.style.padding = '5px';
                 dataCell.style.color = '#000';
-
+                headerCell.style.fontFamily = 'sans-serif';
+                headerCell.style.textTransform = 'none';
                 dataRow.appendChild(dataCell);
             });
             sizeChartTable.appendChild(dataRow);
@@ -163,6 +165,10 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
     // Create a close button
     const closeButton = document.createElement('button');
     closeButton.textContent = 'Close';
+    closeButton.style.fontFamily = 'sans-serif';
+    closeButton.style.color = '#000';
+    closeButton.style.textTransform = 'none';
+
     closeButton.onclick = function () {
         document.body.removeChild(popupContainer);
     };
@@ -354,50 +360,6 @@ function fetchRecommendations(bodyMeasurements, base64ScreenShot, tabUrl) {
             hideLoadingPopup(); // Hide the loading popup regardless of the outcome
         });
 }
-function createAndShowTextPopup(dataHtml) {
-
-    const cleanedDataHtml = dataHtml.replace(/^```html ,|```$/g, '').trim();
-    // Create the popup container
-    const popupContainer = document.createElement('div');
-    popupContainer.id = 'my-extension-popup-container';
-    popupContainer.style.position = 'fixed';
-    popupContainer.style.top = '20%';
-    popupContainer.style.left = '50%';
-    popupContainer.style.transform = 'translateX(-50%)';
-    popupContainer.style.zIndex = '10000000';  // Ensure high enough z-index to be on top
-    popupContainer.style.padding = '20px';
-    popupContainer.style.backgroundColor = 'rgba(255, 255, 255, 1)';
-    popupContainer.style.borderRadius = '10px';
-    popupContainer.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
-    popupContainer.style.maxWidth = '80%';
-    popupContainer.style.maxHeight = '60%';
-    popupContainer.style.overflowY = 'auto';
-
-    // Directly set the innerHTML of the popup container to the returned HTML
-    popupContainer.innerHTML = cleanedDataHtml;
-
-    // Since the HTML content might already include structured elements,
-    // there's no need to create a specific paragraph element for text content.
-
-    // Create a close button
-    const closeButton = document.createElement('button');
-    closeButton.textContent = 'Close';
-    closeButton.className = 'closeButton_faishion'
-
-    closeButton.style.position = 'absolute';
-    closeButton.style.top = '10px';
-    closeButton.style.right = '10px';
-    closeButton.onclick = function () {
-        document.body.removeChild(popupContainer);
-    };
-
-    // The closeButton needs to be appended after setting innerHTML
-    // to avoid overwriting it with the returned HTML content
-    popupContainer.appendChild(closeButton);
-
-    // Append the popup container to the body
-    document.body.appendChild(popupContainer);
-}
 
 function fetchAndRenderSizeChart(currentUrl, pageTitle, srcUrl, pageTitle) {
     // showLoadingPopup('Generating size recommendation for you...');
@@ -493,6 +455,7 @@ function showLoadingPopup(loadingText) {
     spinnerText.style.marginTop = '10px';
     spinnerText.style.textTransform = 'none';
     spinnerText.style.color = '#000';
+    spinnerText.style.fontFamily = 'sans-serif';
 
 
 

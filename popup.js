@@ -189,7 +189,8 @@ document.getElementById('uploadBtn').addEventListener('click', function () {
         // Store the base64 image in local storage
         chrome.storage.local.set({ 'uploadedImage': base64String.replace('data:', '').replace(/^.+,/, '') }, function () {
             if (chrome.runtime.lastError) {
-                alert('An error occurred: ' + chrome.runtime.lastError.message);
+                // alert('An error occurred: ' + chrome.runtime.lastError.message);
+                alert('Sorry, your photo exceeds the size limit. Please compress it or choose a smaller file and try again. Thank you!')
             } else {
                 alert('Image uploaded successfully!');
             }
