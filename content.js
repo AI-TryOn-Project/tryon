@@ -172,7 +172,7 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
     closeButton.onclick = function () {
         document.body.removeChild(popupContainer);
     };
-    closeButton.className = 'closeButton_faishion'
+    closeButton.className = 'closeButton_faishion';
     closeButton.style.position = 'absolute';
 
     closeButton.style.top = '10px';
@@ -215,6 +215,7 @@ function parseDimensionRange(rangeStr) {
 function highlightUserDimensions(userDimensions) {
     const rows = document.querySelectorAll('#sizeChartTable tr:not(:first-child)');
 
+    // Track the closest cell for each dimension
     let closestCells = {
         bust: { cell: null, distance: Infinity },
         hips: { cell: null, distance: Infinity },
@@ -229,6 +230,7 @@ function highlightUserDimensions(userDimensions) {
             const headerText = headers[index].textContent.trim().replace(/\s+/g, '').toLowerCase();
             let userDimensionKey = null;
 
+            // Identify the dimension
             if (headerText === 'bust' || headerText === 'chest') {
                 userDimensionKey = 'bust';
             } else if (headerText === 'hips' || headerText === 'hip') {
@@ -237,13 +239,22 @@ function highlightUserDimensions(userDimensions) {
                 userDimensionKey = 'waist';
             }
 
-            if (userDimensionKey) {
+            if (userDimensionKey && userDimensions[userDimensionKey] !== undefined) {
                 const cellDimensionRange = parseDimensionRange(cell.textContent.trim());
                 const userDimensionValue = parseFloat(userDimensions[userDimensionKey]);
 
-                // 修改这里: 现在只考虑那些最小值大于用户尺寸的单元格
-                if (cellDimensionRange.min >= userDimensionValue) {
-                    const distance = cellDimensionRange.min - userDimensionValue;
+                // Check if the user dimension is within the range
+                if (userDimensionValue >= cellDimensionRange.min && userDimensionValue <= cellDimensionRange.max) {
+                    // If there's an exact match, highlight immediately and stop looking for this dimension
+                    closestCells[userDimensionKey].cell = cell;
+                    closestCells[userDimensionKey].distance = 0;
+                    cell.classList.add('highlight');
+                } else {
+                    // Determine if this cell is the closest match so far for the dimension
+                    const distance = Math.min(
+                        Math.abs(cellDimensionRange.min - userDimensionValue),
+                        Math.abs(cellDimensionRange.max - userDimensionValue)
+                    );
 
                     if (distance < closestCells[userDimensionKey].distance) {
                         closestCells[userDimensionKey].distance = distance;
@@ -254,10 +265,10 @@ function highlightUserDimensions(userDimensions) {
         });
     });
 
-    // Highlight the closest cell for each dimension
+    // Highlight the closest cell for each dimension if no exact match was found
     Object.keys(closestCells).forEach(dimension => {
         const { cell, distance } = closestCells[dimension];
-        if (cell) {
+        if (cell && distance !== 0) {
             cell.classList.add('highlight');
         }
     });
@@ -285,7 +296,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         cropImage(message.dataUrl, message.selection, message.isSizeChart, message.userDimensions, message.tabUrl);
     } else if (message.action === "showHelpfulVids") {
 
-     
+
     }
 });
 
@@ -296,7 +307,7 @@ function cropImage(dataUrl, selection, isSizeChart, userDimensions, tabUrl) {
     img.onload = function () {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        
+
         // Apply the scale factor to the canvas dimensions
         canvas.width = selection.width * pixelRatio * scaleFactor;
         canvas.height = selection.height * pixelRatio * scaleFactor;
@@ -315,7 +326,7 @@ function cropImage(dataUrl, selection, isSizeChart, userDimensions, tabUrl) {
         if (isSizeChart) {
             fetchRecommendations(userDimensions, croppedDataUrl, tabUrl);
         } else {
-            chrome.runtime.sendMessage({ action: "finishedCrop", croppedDataUrl: croppedDataUrl});
+            chrome.runtime.sendMessage({ action: "finishedCrop", croppedDataUrl: croppedDataUrl });
         }
     };
     img.src = dataUrl;
@@ -343,7 +354,7 @@ function fetchRecommendations(bodyMeasurements, base64ScreenShot, tabUrl) {
         .then(response => response.json())
         .then(data => {
             console.log(data);
-            createPopup(null, data, bodyMeasurements)
+            createPopup(null, data, bodyMeasurements);
         })
         .catch(error => console.error('Error:', error))
         .finally(() => {
@@ -384,7 +395,7 @@ function fetchAndRenderSizeChart(currentUrl, pageTitle, srcUrl, pageTitle) {
         })
         .then(data => {
             // This data will now be used in createPopup
-            console.log(data)
+            console.log(data);
             return data;
         })
         .catch(error => {
@@ -441,7 +452,7 @@ function showLoadingPopup(loadingText) {
 
     const spinnerText = document.createElement('div');
     spinnerText.textContent = loadingText;
-    
+
     spinnerText.style.marginTop = '10px';
     spinnerText.style.textTransform = 'none';
     spinnerText.style.color = '#000';
@@ -481,13 +492,13 @@ function showLoadingPopup(loadingText) {
 
 // Function to hide the loading popup
 function hideLoadingPopup() {
-    progress = 99
+    progress = 99;
     const loadingPopup = document.getElementById('my-extension-loading-popup');
     if (loadingPopup) {
-        setTimeout(()=>{
+        setTimeout(() => {
             document.body.removeChild(loadingPopup);
-            progress = 0
-        },250)
+            progress = 0;
+        }, 250);
     }
 }
 
@@ -510,7 +521,7 @@ function createOverlay(isSizeChart, userDimensions) {
 
     overlay.addEventListener('mousedown', startSelection);
     overlay.addEventListener('mousemove', resizeSelection);
-    overlay.addEventListener('mouseup', function(event) {
+    overlay.addEventListener('mouseup', function (event) {
         endSelection(event, isSizeChart, userDimensions);
     });
     document.addEventListener('keydown', cancelSelection); // Add keydown listener
@@ -573,7 +584,7 @@ function resizeSelection(event) {
 
 
 async function endSelection(event, isSizeChart, userDimensions) {
-    console.log(isSizeChart)
+    console.log(isSizeChart);
     if (selectionBox) {
         overlay.removeEventListener('mousedown', startSelection);
         overlay.removeEventListener('mousemove', resizeSelection);
@@ -586,7 +597,7 @@ async function endSelection(event, isSizeChart, userDimensions) {
             height: parseInt(selectionBox.style.height, 10)
         };
 
-        chrome.runtime.sendMessage({ action: "captureSelectedArea", coordinates: selectionCoordinates, isSizeChart: isSizeChart, userDimensions: userDimensions}); 
+        chrome.runtime.sendMessage({ action: "captureSelectedArea", coordinates: selectionCoordinates, isSizeChart: isSizeChart, userDimensions: userDimensions });
         // Clean up
         overlay.remove();
         isSelecting = false;
