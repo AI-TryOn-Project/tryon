@@ -37,6 +37,9 @@
                             image
                             to upload</div>
                     </label>
+                    <div class="right-click-text" id="rightClickext">
+                        <span>Right-click on any model picture to try on virtually</span>
+                    </div>
                     <img id="imagePreview" src="" class="tab-content-upload-preview" alt="Image preview">
                     <input type="file" id="imageUpload" accept="image/webp, image/png, image/jpeg, image/jpg, image/bmp, " class="tab-content-upload-input">
                     <button id="uploadBtn" class="tab-content-action-btn">
@@ -45,10 +48,16 @@
                     </button>
                     <p id="imageUploadPrompt">Clear, well-lit facial image
                     </p>
-                    <div>
-                        <input id="prompt" type="text" class="tab-content-body-dim-text-field">
+                    <div class="scene-container" id="sceneContainer">
+                        <!-- <label for="prompt" class="tab-content-body-dim-text-name scene-label">Scene</label> -->
+                        <input 
+                            id="prompt" 
+                            type="text" 
+                            class="tab-content-body-dim-text-field scene-input"
+                            placeholder="on the beach"
+                        >
                         </input>
-                        <p class="tab-content-body-dim-text-name">Prompt</p>
+                        <p class="tab-content-body-dim-text-name scene-desc">Input your preferred try-on scene</p>
                     </div>
                 </div>
             </div>

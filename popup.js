@@ -41,10 +41,14 @@ function renderImgUploadedUI() {
     upload.classList.add('hidden');
 
     // Replace upload prompt
-    document.getElementById("imageUploadPrompt").textContent = "Image saved successfully! Right-click on any model picture for instant face swap.";
+    document.getElementById("imageUploadPrompt").textContent = "";
 
     // Upload btn -> change btn
+    document.getElementById("sceneContainer").style.display = "block";
+    document.getElementById("rightClickext").style.display = "block";
     document.getElementById("uploadBtnText").textContent = "CHANGE";
+
+    
     document.getElementById("uploadBtnIcon").src = "resources/icon-upload-change.svg";
 }
 /* Helpers end */
@@ -180,6 +184,8 @@ document.getElementById('uploadBtn').addEventListener('click', function () {
 
         // Upload btn -> change btn
         document.getElementById("uploadBtnText").textContent = "UPLOAD";
+        document.getElementById("sceneContainer").style.display = "none";
+        document.getElementById("rightClickext").style.display = "none";
         document.getElementById("uploadBtnIcon").src = "resources/icon-upload-cloud.svg";
 
         // Purge selected img

@@ -196,8 +196,30 @@ body {
 }
 
 .tab-content-upload-preview {
-  height: 65px;
+  height: 75px;
   width: auto;
+}
+.right-click-text{
+  position: fixed;
+  top: 30px;
+  font-family: "Roboto", sans-serif;
+  font-style: normal;
+  font-size: 11px;
+  text-align: center;
+  color:#FFF;
+  margin-top: 5px;
+  border-radius: 10px;
+  padding: 5px;
+}
+.right-click-text:hover{
+   background-color: rgba(0, 0, 0, 0.4);
+   
+}
+.right-click-text span{
+  opacity: 0;
+}
+.right-click-text:hover span{
+  opacity: 1;
 }
 
 .tab-content-upload-prompt {
@@ -275,7 +297,13 @@ body {
   font-style: normal;
   font-size: 9px;
 }
-
+.scene-container{
+  margin-top: -10px;
+  display: none;
+}
+.scene-input{
+  width: 120px;
+}
 /* Hide the number input spinner */
 .tab-content-body-dim-text-field::-webkit-outer-spin-button,
 .tab-content-body-dim-text-field::-webkit-inner-spin-button {
@@ -314,7 +342,14 @@ body {
   margin-top: 5px;
   height: 7px;
 }
-
+.scene-label{
+  font-size: 8px !important;
+  top: 0px;
+}
+.scene-desc{
+  font-size: 8px !important;
+  left: -5px;
+}
 .tab-content-size-recom-btn {
   display: inline-flex;
   align-items: center;
