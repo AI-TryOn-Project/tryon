@@ -94,6 +94,18 @@ document.addEventListener('DOMContentLoaded', function () {
             imagePreview.classList.remove('hidden'); // Show the image preview
         }
     });
+
+    const inputField = document.getElementById('prompt');
+
+    // Load saved data from chrome.storage using the 'savedPrompt' key
+    chrome.storage.local.get(['savedPrompt'], function(result) {
+        inputField.value = result.savedPrompt || '';
+    });
+
+    // Save data to chrome.storage whenever it changes, using the 'savedPrompt' key
+    inputField.addEventListener('input', function() {
+        chrome.storage.local.set({'savedPrompt': inputField.value});
+    });
 });
 /* Lifecycle methods end */
 
