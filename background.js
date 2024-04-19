@@ -75,25 +75,28 @@ function fetchImageAsBase64(url, callback) {
     chrome.tabs.sendMessage(tab.id, {
       action: 'showLoading'
     });
+
+    chrome.storage.local.get(['savedPrompt'], function(result) {
+      const savedPrompt = result.savedPrompt || "fit woman, on the busy street, bright sunshine";
     
-    const data = {
-        "source_image": sourceImageBase64,
-        "target_image": targetImageBase64,
-        "upscale": !useLowRes
-    };
-  
-    fetch('https://sdrelay.tianlong.co.uk/relay', {
-      method: 'POST',
-      headers: {
-        'accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(data => {
-      const imageBase64 = data.image;
-      console.log("finished processubg")
+        const data = {
+            "model": lastRightClickedImageSrc,
+            "face": sourceImageBase64,
+            "prompt": savedPrompt // Use the loaded prompt
+        };
+    
+        fetch('https://tryon-advanced.tianlong.co.uk/upload/images', {
+          method: 'POST',
+          headers: {
+            'accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+          const imageBase64 = data.image;
+          console.log("finished processubg")
 
       chrome.storage.local.get('bodyDimensionsIn', function(result) {
           const userDimensions = result.bodyDimensionsIn || {};
@@ -107,9 +110,10 @@ function fetchImageAsBase64(url, callback) {
           });
       });
 
-    })
-    .catch(error => {
-      console.error('Error:', error);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
     });
   }
   
@@ -157,4 +161,3 @@ function fetchImageAsBase64(url, callback) {
       sendApiRequest(sourceImageBase64, targetImageBase64, srcUrl, tab, pageUrl, useLowRes);
     });
   }
-
