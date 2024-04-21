@@ -59,20 +59,22 @@ chrome.runtime.onMessage.addListener(async function (
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       const currentTab = tabs[0];
       const { formData } = message;
-      chrome.storage.local.set({ enhanceTryOnData: formData });
-      chrome.storage.local.get(["lastRightClickedImageSrc"], function (result) {
-        fetchImageAsBase64(
-          result.lastRightClickedImageSrc,
-          (targetImageBase64) => {
-            generateTryOn(
-              targetImageBase64,
-              result.lastRightClickedImageSrc,
-              currentTab,
-              currentTab.url
+      chrome.storage.local.set({ enhanceTryOnData: formData }, function() {
+        // This code doesn't execute until the storage is updated
+        chrome.storage.local.get(["lastRightClickedImageSrc"], function(result) {
+            fetchImageAsBase64(
+                result.lastRightClickedImageSrc,
+                (targetImageBase64) => {
+                    generateTryOn(
+                        targetImageBase64,
+                        result.lastRightClickedImageSrc,
+                        currentTab,
+                        currentTab.url
+                    );
+                }
             );
-          }
-        );
-      });
+        });
+    });    
     });
   }
 });
