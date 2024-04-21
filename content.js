@@ -32,6 +32,44 @@ function addStyles() {
         border-radius: 2px;
         padding:1px 2px;
       }
+      .enhanceButton_faishion {
+        background-color: rgb(255, 255, 255);
+        font-family: "Roboto", sans-serif;
+        top: 10px;
+        left: 10px;
+        border: solid 0.5px #000;
+        cursor: pointer;
+        border-radius: 2px;
+        padding:1px 2px;
+      }
+      .my-extension-image-popup-enhance {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        z-index: 999999999999999;
+      }
+      .enhance-form-container {
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+      }
+      #confirmButton {
+        width: 60%;
+        border-radius: 4px;
+        padding: 4px;
+        background-color: #007bff;
+      }
+      .enhance-close-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        cursor: pointer;
+        font-family: "Roboto", sans-serif;
+      }
   `;
     document.head.appendChild(styleElement);
 }
@@ -66,7 +104,105 @@ function makeDraggable(element) {
     element.addEventListener('mousedown', onMouseDown);
 }
 
+// Function to create a select element with options
+function createSelect(id, options) {
+    let select = document.createElement('select');
+    select.id = id;
+  
+    options.forEach(opt => {
+      let option = document.createElement('option');
+      option.value = opt.toLowerCase();
+      option.textContent = opt;
+      select.appendChild(option);
+    });
+  
+    return select;
+  }
+  
+  // Function to create a label for a select element
+  function createLabel(forId, text) {
+    let label = document.createElement('label');
+    label.htmlFor = forId;
+    label.textContent = text;
+    label.style.marginTop = '10px';
+    label.style.marginBottom = '5px';
+    return label;
+  }
+  // Function to create an input element
+function createInput(id, type) {
+    let input = document.createElement('input');
+    input.type = type;
+    input.id = id;
+    return input;
+  }
+  function createButton(id, text, onClickFunction) {
+    event.preventDefault();
+    let buttonContainer = document.createElement('div');
+    buttonContainer.style.display = 'flex';
+    buttonContainer.style.justifyContent = 'center'
+    buttonContainer.style.width = '100%';
 
+    let button = document.createElement('button');
+    button.id = id;
+    button.textContent = text;
+    button.style.fontWeight = 500;
+    button.onclick = onClickFunction;
+    button.style.marginTop = '10px'; // Space out elements
+    button.style.cursor = 'pointer';
+
+    buttonContainer.appendChild(button)
+    return buttonContainer;
+  }
+  function logFormValues() {
+    event.preventDefault();
+    const formElements = document.forms['enhanceTryOnForm'].elements;
+    const formData = {};
+    for (let i = 0; i < formElements.length; i++) {
+      const element = formElements[i];
+      if (element.tagName === 'SELECT' || element.tagName === 'INPUT') {
+        formData[element.id] = element.value;
+      }
+    }
+    document.getElementById('my-extension-image-popup').style.display = 'none';
+    console.log(formData);
+    // 发送消息enhanceRegenerate
+    chrome.runtime.sendMessage({ action: "enhanceRegenerate", formData: formData });
+  }
+  function closeFormOverlay() {
+    document.getElementById('formOverlay').style.display = 'none';
+  }
+// Function to create the overlay form
+function createFormOverlay() {
+    // Create the overlay div
+    let formOverlay = document.createElement('div');
+    formOverlay.className = 'enhance-form-container';
+ 
+    
+  // Append labels and selects/inputs to the form overlay
+  formOverlay.appendChild(createLabel('race', 'Race'));
+  formOverlay.appendChild(createSelect('race', ['Asian', 'Caucasian', 'African', 'Hispanic', 'Other']));
+  
+  formOverlay.appendChild(createLabel('sex', 'Sex'));
+  formOverlay.appendChild(createSelect('sex', ['Male', 'Female', 'Other']));
+  
+  formOverlay.appendChild(createLabel('age', 'Age'));
+  formOverlay.appendChild(createInput('age', 'number'));
+  
+  formOverlay.appendChild(createLabel('skinColor', 'Skin Color'));
+  formOverlay.appendChild(createInput('skinColor', 'text'));
+  
+  formOverlay.appendChild(createLabel('bodyShape', 'Body Shape'));
+  formOverlay.appendChild(createSelect('bodyShape', ['Slim', 'Fit', 'Curvy']));
+    // Confirm button
+    let confirmButton = createButton('confirmButton', 'Confirm & Regenerate', logFormValues);
+    formOverlay.appendChild(confirmButton);
+    let form = document.createElement('form');
+    form.name = 'enhanceTryOnForm';
+    form.appendChild(formOverlay);
+  
+    return form;
+    
+  }
 function createPopup(imageBase64, sizeChartData, userDimensions) {
     // Create the popup container with a fixed width
     const popupContainer = document.createElement('div');
@@ -89,13 +225,21 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
     popupContainer.style.overflow = 'auto';
 
     // Create the image element
+    const imageContainerElement = document.createElement('div');
+    imageContainerElement.style.position = 'relative';
+    imageContainerElement.style.maxWidth = '50%'; // Adjust width as needed
+    imageContainerElement.style.maxHeight = '100%';
+    imageContainerElement.style.borderRadius = '4px';
+    imageContainerElement.style.marginRight = '20px';
+
     const imageElement = document.createElement('img');
     imageElement.src = imageBase64;
-    imageElement.style.maxWidth = '50%'; // Adjust width as needed
-    imageElement.style.maxHeight = '100%';
+    imageElement.style.width = '100%'; // Adjust width as needed
+    imageElement.style.height = '100%';
     imageElement.style.borderRadius = '4px';
     imageElement.style.marginRight = '20px';
 
+    imageContainerElement.appendChild(imageElement);
     // Create the size chart container
     const sizeChartContainer = document.createElement('div');
     sizeChartContainer.style.flexGrow = sizeChartData ? '1' : '0'; // Adjust based on sizeChartData
@@ -157,7 +301,7 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
     }
     // Append the image and close button to the popup
     if (imageBase64) {
-        popupContainer.appendChild(imageElement);
+        popupContainer.appendChild(imageContainerElement);
     }
     // Append the size chart container to the popup
     popupContainer.appendChild(sizeChartContainer);
@@ -180,6 +324,45 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
 
     // Append the close button to the popup
     popupContainer.appendChild(closeButton);
+
+
+    // enhance button
+    const enhanceButton = document.createElement('button');
+    enhanceButton.textContent = 'Enhance Try-On';
+    enhanceButton.style.fontFamily = 'sans-serif';
+    enhanceButton.style.color = '#000';
+    enhanceButton.style.textTransform = 'none';
+
+    enhanceButton.onclick = function () {
+        // 创新一个新的弹窗
+        const enhancePopupContainer = document.createElement('div');
+        enhancePopupContainer.className = 'my-extension-image-popup-enhance';
+
+        let closeButton = document.createElement('div');
+        closeButton.textContent = 'Close';
+        closeButton.className = 'enhance-close-button'
+        // 点击时关闭弹窗
+        closeButton.onclick = function () {
+            imageContainerElement.removeChild(enhancePopupContainer);
+        };
+        
+        enhancePopupContainer.appendChild(closeButton);
+        enhancePopupContainer.appendChild(createFormOverlay());
+
+        
+        console.log("enhance button clicked",enhancePopupContainer);
+        imageContainerElement.appendChild(enhancePopupContainer);
+        // makeDraggable(enhancePopupContainer);
+
+    };
+    enhanceButton.className = 'enhanceButton_faishion';
+    enhanceButton.style.position = 'absolute';
+
+    enhanceButton.style.top = '10px';
+    enhanceButton.style.left = '10px';
+
+    // Append the close button to the popup
+    popupContainer.appendChild(enhanceButton);
 
     makeDraggable(popupContainer);
 
