@@ -180,10 +180,10 @@ function createFormOverlay() {
     
   // Append labels and selects/inputs to the form overlay
   formOverlay.appendChild(createLabel('race', 'Race'));
-  formOverlay.appendChild(createSelect('race', ['Asian', 'Caucasian', 'African', 'Hispanic', 'Other']));
+  formOverlay.appendChild(createSelect('race', ['Asian', 'Caucasian', 'African', 'Hispanic']));
   
   formOverlay.appendChild(createLabel('sex', 'Sex'));
-  formOverlay.appendChild(createSelect('sex', ['Male', 'Female', 'Other']));
+  formOverlay.appendChild(createSelect('sex', ['Male', 'Female']));
   
   formOverlay.appendChild(createLabel('age', 'Age'));
   formOverlay.appendChild(createInput('age', 'number'));
