@@ -148,7 +148,6 @@ function createInput(id, type,initialValue) {
   return input;
 }
 function createButton(id, text, onClickFunction) {
-  event.preventDefault();
   let buttonContainer = document.createElement("div");
   buttonContainer.style.display = "flex";
   buttonContainer.style.justifyContent = "center";
@@ -158,15 +157,19 @@ function createButton(id, text, onClickFunction) {
   button.id = id;
   button.textContent = text;
   button.style.fontWeight = 500;
-  button.onclick = onClickFunction;
+  button.onclick = function(event) {
+    event.preventDefault(); // Use preventDefault here, inside the event handler
+    onClickFunction(event); // Pass the event to the handler
+  };
   button.style.marginTop = "10px"; // Space out elements
   button.style.cursor = "pointer";
 
   buttonContainer.appendChild(button);
   return buttonContainer;
 }
-function logFormValues() {
-  event.preventDefault();
+
+function logFormValues(event) {
+  event.preventDefault(); // Ensure event is used here
   const formElements = document.forms["enhanceTryOnForm"].elements;
   const formData = {};
   for (let i = 0; i < formElements.length; i++) {
@@ -183,18 +186,21 @@ function logFormValues() {
     formData: formData,
   });
 }
+
 function closeFormOverlay() {
   document.getElementById("formOverlay").style.display = "none";
 }
 // Function to create the overlay form
-function createFormOverlay() {
+async function createFormOverlay() {
   // Create the overlay div
   let formOverlay = document.createElement("div");
   formOverlay.className = "enhance-form-container";
-  // 获取保存到本地的enhanceTryOnData
-  let enhanceTryOnData = {};
-  chrome.storage.local.get(["enhanceTryOnData"], function (result) {
-    enhanceTryOnData = result.enhanceTryOnData;
+
+  // Asynchronously get saved enhanceTryOnData from local storage
+  let enhanceTryOnData = await new Promise((resolve) => {
+    chrome.storage.local.get(["enhanceTryOnData"], function (result) {
+      resolve(result.enhanceTryOnData || {});
+    });
   });
   const { ethnic, sex, age, skinColor, bodyShape } = enhanceTryOnData;
   // Append labels and selects/inputs to the form overlay
@@ -219,7 +225,7 @@ function createFormOverlay() {
   formOverlay.appendChild(createInput("age", "number",age));
 
   formOverlay.appendChild(createLabel("skinColor", "Skin Color"));
-  formOverlay.appendChild(createInput("skinColor", "text",skinColor));
+  formOverlay.appendChild(createInput("skinColor", "text", skinColor));
 
   formOverlay.appendChild(createLabel("bodyShape", "Body Shape"));
   formOverlay.appendChild(createSelect("bodyShape", ["Slim", "Fit", "Curvy"],bodyShape));
@@ -379,7 +385,9 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
     };
 
     enhancePopupContainer.appendChild(closeButton);
-    enhancePopupContainer.appendChild(createFormOverlay());
+    createFormOverlay().then(form => {
+      enhancePopupContainer.appendChild(form);
+    });
 
     console.log("enhance button clicked", enhancePopupContainer);
     imageContainerElement.appendChild(enhancePopupContainer);

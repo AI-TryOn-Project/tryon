@@ -114,7 +114,7 @@ function fetchImageAsBase64(url, callback) {
 }
 
 // This function sends the API request to your server
-function sendApiRequest(
+async function sendApiRequest(
   sourceImageBase64,
   targetImageBase64,
   lastRightClickedImageSrc,
@@ -125,11 +125,16 @@ function sendApiRequest(
   chrome.tabs.sendMessage(tab.id, {
     action: "showLoading",
   });
-  let enhanceTryOnData = {};
-  chrome.storage.local.get("enhanceTryOnData", function (result) {
-    enhanceTryOnData = result.enhanceTryOnData;
-  });
-  console.log("enhanceTryOnData", enhanceTryOnData);
+  const getStorageData = (key) => {
+    return new Promise((resolve) => {
+      chrome.storage.local.get([key], function (result) {
+        resolve(result[key]);
+      });
+    });
+  };
+
+  // Asynchronously retrieve data from storage
+  const enhanceTryOnData = await getStorageData("enhanceTryOnData") || {};
   chrome.storage.local.get(["savedPrompt"], function (result) {
     const savedPrompt =
       result.savedPrompt || "fit woman, on the busy street, bright sunshine";
