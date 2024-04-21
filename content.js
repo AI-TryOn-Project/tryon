@@ -213,7 +213,7 @@ function createFormOverlay() {
   );
 
   formOverlay.appendChild(createLabel("sex", "Sex"));
-  formOverlay.appendChild(createSelect("sex", ["Male", "Female"],sex));
+  formOverlay.appendChild(createSelect("sex", ["Female", "Male"],sex));
 
   formOverlay.appendChild(createLabel("age", "Age"));
   formOverlay.appendChild(createInput("age", "number",age));
