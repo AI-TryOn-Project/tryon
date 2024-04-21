@@ -69,7 +69,8 @@ chrome.runtime.onMessage.addListener(async function (
                         targetImageBase64,
                         result.lastRightClickedImageSrc,
                         currentTab,
-                        currentTab.url
+                        currentTab.url,
+                        formData
                     );
                 }
             );
@@ -122,7 +123,8 @@ async function sendApiRequest(
   lastRightClickedImageSrc,
   tab,
   pageUrl,
-  useLowRes
+  useLowRes,
+  formData = null
 ) {
   chrome.tabs.sendMessage(tab.id, {
     action: "showLoading",
@@ -136,7 +138,7 @@ async function sendApiRequest(
   };
 
   // Asynchronously retrieve data from storage
-  const enhanceTryOnData = await getStorageData("enhanceTryOnData") || {};
+  const enhanceTryOnData = formData || await getStorageData("enhanceTryOnData") || {};
   chrome.storage.local.get(["savedPrompt"], function (result) {
     const savedPrompt =
       result.savedPrompt || "fit woman, on the busy street, bright sunshine";
@@ -212,7 +214,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
-function generateTryOn(targetImageBase64, srcUrl, tab, pageUrl) {
+function generateTryOn(targetImageBase64, srcUrl, tab, pageUrl, formData=null) {
   // Assuming 'targetImage.png' is in the 'images' directory of your extension
   chrome.storage.local.get(["uploadedImage", "lowRes"], function (data) {
     const sourceImageBase64 = data.uploadedImage;
@@ -229,7 +231,8 @@ function generateTryOn(targetImageBase64, srcUrl, tab, pageUrl) {
       srcUrl,
       tab,
       pageUrl,
-      useLowRes
+      useLowRes,
+      formData
     );
   });
 }
