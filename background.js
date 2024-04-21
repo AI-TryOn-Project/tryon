@@ -146,6 +146,7 @@ async function sendApiRequest(
       face: sourceImageBase64,
       prompt: savedPrompt, // Use the loaded prompt
       enhanceTryOnData: enhanceTryOnData,
+      pageUrl: pageUrl
     };
 
     fetch("https://tryon-advanced.tianlong.co.uk/upload/images", {
