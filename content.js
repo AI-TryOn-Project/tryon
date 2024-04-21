@@ -111,14 +111,19 @@ function makeDraggable(element) {
 }
 
 // Function to create a select element with options
-function createSelect(id, options) {
+function createSelect(id, options,initialValue) {
   let select = document.createElement("select");
   select.id = id;
 
-  options.forEach((opt) => {
-    let option = document.createElement("option");
+  options.forEach(opt => {
+    let option = document.createElement('option');
     option.value = opt.toLowerCase();
     option.textContent = opt;
+    if(initialValue){
+        if (option.value === initialValue.toLowerCase()) {
+            option.selected = true;
+          }
+    }
     select.appendChild(option);
   });
 
@@ -135,10 +140,11 @@ function createLabel(forId, text) {
   return label;
 }
 // Function to create an input element
-function createInput(id, type) {
+function createInput(id, type,initialValue) {
   let input = document.createElement("input");
   input.type = type;
   input.id = id;
+  input.value = initialValue; // Set the initial value
   return input;
 }
 function createButton(id, text, onClickFunction) {
@@ -185,11 +191,16 @@ function createFormOverlay() {
   // Create the overlay div
   let formOverlay = document.createElement("div");
   formOverlay.className = "enhance-form-container";
-
+  // 获取保存到本地的enhanceTryOnData
+  let enhanceTryOnData = {};
+  chrome.storage.local.get(["enhanceTryOnData"], function (result) {
+    enhanceTryOnData = result.enhanceTryOnData;
+  });
+  const { ethnic, sex, age, skinColor, bodyShape } = enhanceTryOnData;
   // Append labels and selects/inputs to the form overlay
   formOverlay.appendChild(createLabel("ethnic", "Ethnic"));
   formOverlay.appendChild(
-    createSelect("race", [
+    createSelect("ethnic", [
       "African",
       "American",
       "Hispanic ",
@@ -198,20 +209,20 @@ function createFormOverlay() {
       "Native American",
       "Native Hawaiian",
       "Middle Eastern",
-    ])
+    ],ethnic)
   );
 
   formOverlay.appendChild(createLabel("sex", "Sex"));
-  formOverlay.appendChild(createSelect("sex", ["Male", "Female"]));
+  formOverlay.appendChild(createSelect("sex", ["Male", "Female"],sex));
 
   formOverlay.appendChild(createLabel("age", "Age"));
-  formOverlay.appendChild(createInput("age", "number"));
+  formOverlay.appendChild(createInput("age", "number",age));
 
   formOverlay.appendChild(createLabel("skinColor", "Skin Color"));
-  formOverlay.appendChild(createInput("skinColor", "text"));
+  formOverlay.appendChild(createInput("skinColor", "text",skinColor));
 
   formOverlay.appendChild(createLabel("bodyShape", "Body Shape"));
-  formOverlay.appendChild(createSelect("bodyShape", ["Slim", "Fit", "Curvy"]));
+  formOverlay.appendChild(createSelect("bodyShape", ["Slim", "Fit", "Curvy"],bodyShape));
   // Confirm button
   let confirmButton = createButton(
     "confirmButton",
