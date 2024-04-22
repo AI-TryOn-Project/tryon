@@ -111,24 +111,25 @@ function makeDraggable(element) {
 }
 
 // Function to create a select element with options
-function createSelect(id, options,initialValue) {
+function createSelect(id, options, initialValue) {
   let select = document.createElement("select");
   select.id = id;
-
-  options.forEach(opt => {
-    let option = document.createElement('option');
+//   select.style.border = "unset";
+  select.style.backgroundColor = "#fff";
+  options.forEach((opt) => {
+    let option = document.createElement("option");
     option.value = opt.toLowerCase();
     option.textContent = opt;
-    if(initialValue){
-        if (option.value === initialValue.toLowerCase()) {
-            option.selected = true;
-          }
+    if (initialValue) {
+      if (option.value === initialValue.toLowerCase()) {
+        option.selected = true;
+      }
     }
     select.appendChild(option);
     select.onchange = function () {
-        console.log(select.value);
-        // 设置表单的值
-        document.getElementById(id).value = select.value;
+      console.log(select.value);
+      // 设置表单的值
+      document.getElementById(id).value = select.value;
     };
   });
 
@@ -145,8 +146,10 @@ function createLabel(forId, text) {
   return label;
 }
 // Function to create an input element
-function createInput(id, type,initialValue) {
+function createInput(id, type, initialValue) {
   let input = document.createElement("input");
+//   input.style.border = "unset";
+  input.style.backgroundColor = "#fff";
   input.type = type;
   input.id = id;
   input.value = initialValue; // Set the initial value
@@ -197,23 +200,30 @@ function closeFormOverlay() {
 }
 
 function getStorageData(key) {
-    return new Promise((resolve, reject) => {
-      chrome.storage.local.get(key, (result) => {
-        if (chrome.runtime.lastError) {
-          // If there's an error, reject the promise
-          reject(new Error(chrome.runtime.lastError));
-        } else {
-          // Resolve the promise with the result
-          resolve(result[key]);
-        }
-      });
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get(key, (result) => {
+      if (chrome.runtime.lastError) {
+        // If there's an error, reject the promise
+        reject(new Error(chrome.runtime.lastError));
+      } else {
+        // Resolve the promise with the result
+        resolve(result[key]);
+      }
     });
-  }
+  });
+}
 // Function to create the overlay form
 async function createFormOverlay(enhanceTryOnData) {
-    const { ethnic, sex, age, skinColor, bodyShape } = enhanceTryOnData;
+  const { ethnic, sex, age, skinColor, bodyShape } = enhanceTryOnData;
 
-    console.log(ethnic, sex, age, skinColor, bodyShape,'enhanceTryOnDataInit!!!!');
+  console.log(
+    ethnic,
+    sex,
+    age,
+    skinColor,
+    bodyShape,
+    "enhanceTryOnDataInit!!!!"
+  );
 
   // Create the overlay div
   let formOverlay = document.createElement("div");
@@ -222,29 +232,35 @@ async function createFormOverlay(enhanceTryOnData) {
 
   formOverlay.appendChild(createLabel("ethnic", "Ethnic"));
   formOverlay.appendChild(
-    createSelect("ethnic", [
-      "African",
-      "American",
-      "Hispanic ",
-      "Asian",
-      "White",
-      "Native American",
-      "Native Hawaiian",
-      "Middle Eastern",
-    ],ethnic)
+    createSelect(
+      "ethnic",
+      [
+        "African",
+        "American",
+        "Hispanic ",
+        "Asian",
+        "White",
+        "Native American",
+        "Native Hawaiian",
+        "Middle Eastern",
+      ],
+      ethnic
+    )
   );
 
   formOverlay.appendChild(createLabel("sex", "Sex"));
-  formOverlay.appendChild(createSelect("sex", ["Female", "Male"],sex));
+  formOverlay.appendChild(createSelect("sex", ["Female", "Male"], sex));
 
   formOverlay.appendChild(createLabel("age", "Age"));
-  formOverlay.appendChild(createInput("age", "number",age));
+  formOverlay.appendChild(createInput("age", "number", age));
 
   formOverlay.appendChild(createLabel("skinColor", "Skin Color"));
-  formOverlay.appendChild(createInput("skinColor", "text",skinColor));
+  formOverlay.appendChild(createInput("skinColor", "text", skinColor));
 
   formOverlay.appendChild(createLabel("bodyShape", "Body Shape"));
-  formOverlay.appendChild(createSelect("bodyShape", ["Slim", "Fit", "Curvy"],bodyShape));
+  formOverlay.appendChild(
+    createSelect("bodyShape", ["Slim", "Fit", "Curvy"], bodyShape)
+  );
   // Confirm button
   let confirmButton = createButton(
     "confirmButton",
@@ -402,10 +418,17 @@ async function createPopup(imageBase64, sizeChartData, userDimensions) {
 
     enhancePopupContainer.appendChild(closeButton);
     const enhanceTryOnData = await getStorageData("enhanceTryOnData");
-    console.log(enhanceTryOnData,'!!!!!!')
+    console.log(enhanceTryOnData, "!!!!!!");
     const { ethnic, sex, age, skinColor, bodyShape } = enhanceTryOnData;
-    console.log(ethnic, sex, age, skinColor, bodyShape,'enhanceTryOnDataInit!!!!');
-    const node = await createFormOverlay(enhanceTryOnData)
+    console.log(
+      ethnic,
+      sex,
+      age,
+      skinColor,
+      bodyShape,
+      "enhanceTryOnDataInit!!!!"
+    );
+    const node = await createFormOverlay(enhanceTryOnData);
     enhancePopupContainer.appendChild(node);
 
     console.log("enhance button clicked", enhancePopupContainer);
