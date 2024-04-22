@@ -125,6 +125,11 @@ function createSelect(id, options,initialValue) {
           }
     }
     select.appendChild(option);
+    select.onchange = function () {
+        console.log(select.value);
+        // 设置表单的值
+        document.getElementById(id).value = select.value;
+    };
   });
 
   return select;
@@ -145,10 +150,14 @@ function createInput(id, type,initialValue) {
   input.type = type;
   input.id = id;
   input.value = initialValue; // Set the initial value
+  input.onchange = function () {
+    console.log(input.value);
+    // 设置表单的值
+    document.getElementById(id).value = input.value;
+  };
   return input;
 }
 function createButton(id, text, onClickFunction) {
-  event.preventDefault();
   let buttonContainer = document.createElement("div");
   buttonContainer.style.display = "flex";
   buttonContainer.style.justifyContent = "center";
@@ -186,18 +195,31 @@ function logFormValues() {
 function closeFormOverlay() {
   document.getElementById("formOverlay").style.display = "none";
 }
+
+function getStorageData(key) {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get(key, (result) => {
+        if (chrome.runtime.lastError) {
+          // If there's an error, reject the promise
+          reject(new Error(chrome.runtime.lastError));
+        } else {
+          // Resolve the promise with the result
+          resolve(result[key]);
+        }
+      });
+    });
+  }
 // Function to create the overlay form
-function createFormOverlay() {
+async function createFormOverlay(enhanceTryOnData) {
+    const { ethnic, sex, age, skinColor, bodyShape } = enhanceTryOnData;
+
+    console.log(ethnic, sex, age, skinColor, bodyShape,'enhanceTryOnDataInit!!!!');
+
   // Create the overlay div
   let formOverlay = document.createElement("div");
   formOverlay.className = "enhance-form-container";
   // 获取保存到本地的enhanceTryOnData
-  let enhanceTryOnData = {};
-  chrome.storage.local.get(["enhanceTryOnData"], function (result) {
-    enhanceTryOnData = result.enhanceTryOnData;
-  });
-  const { ethnic, sex, age, skinColor, bodyShape } = enhanceTryOnData;
-  // Append labels and selects/inputs to the form overlay
+
   formOverlay.appendChild(createLabel("ethnic", "Ethnic"));
   formOverlay.appendChild(
     createSelect("ethnic", [
@@ -236,7 +258,7 @@ function createFormOverlay() {
 
   return form;
 }
-function createPopup(imageBase64, sizeChartData, userDimensions) {
+async function createPopup(imageBase64, sizeChartData, userDimensions) {
   // Create the popup container with a fixed width
   const popupContainer = document.createElement("div");
   popupContainer.id = "my-extension-image-popup";
@@ -365,7 +387,7 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
   enhanceButton.style.color = "#000";
   enhanceButton.style.textTransform = "none";
 
-  enhanceButton.onclick = function () {
+  enhanceButton.onclick = async function () {
     // 创新一个新的弹窗
     const enhancePopupContainer = document.createElement("div");
     enhancePopupContainer.className = "my-extension-image-popup-enhance";
@@ -379,7 +401,12 @@ function createPopup(imageBase64, sizeChartData, userDimensions) {
     };
 
     enhancePopupContainer.appendChild(closeButton);
-    enhancePopupContainer.appendChild(createFormOverlay());
+    const enhanceTryOnData = await getStorageData("enhanceTryOnData");
+    console.log(enhanceTryOnData,'!!!!!!')
+    const { ethnic, sex, age, skinColor, bodyShape } = enhanceTryOnData;
+    console.log(ethnic, sex, age, skinColor, bodyShape,'enhanceTryOnDataInit!!!!');
+    const node = await createFormOverlay(enhanceTryOnData)
+    enhancePopupContainer.appendChild(node);
 
     console.log("enhance button clicked", enhancePopupContainer);
     imageContainerElement.appendChild(enhancePopupContainer);
