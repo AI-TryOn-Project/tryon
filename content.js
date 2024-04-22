@@ -214,7 +214,7 @@ function getStorageData(key) {
 }
 // Function to create the overlay form
 async function createFormOverlay(enhanceTryOnData) {
-  const { ethnic, sex, age, skinColor, bodyShape } = enhanceTryOnData;
+  const { ethnic, sex, age, skinColor, bodyShape } = enhanceTryOnData||{};
 
   console.log(
     ethnic,
@@ -244,7 +244,7 @@ async function createFormOverlay(enhanceTryOnData) {
         "Native Hawaiian",
         "Middle Eastern",
       ],
-      ethnic
+      ethnic||"Asian"
     )
   );
 
@@ -255,11 +255,11 @@ async function createFormOverlay(enhanceTryOnData) {
   formOverlay.appendChild(createInput("age", "number", age));
 
   formOverlay.appendChild(createLabel("skinColor", "Skin Color"));
-  formOverlay.appendChild(createInput("skinColor", "text", skinColor));
+  formOverlay.appendChild(createInput("skinColor", "text", skinColor||''));
 
   formOverlay.appendChild(createLabel("bodyShape", "Body Shape"));
   formOverlay.appendChild(
-    createSelect("bodyShape", ["Slim", "Fit", "Curvy"], bodyShape)
+    createSelect("bodyShape", ["Slim", "Fit", "Curvy"], bodyShape||"Fit")
   );
   // Confirm button
   let confirmButton = createButton(
@@ -419,7 +419,7 @@ async function createPopup(imageBase64, sizeChartData, userDimensions) {
     enhancePopupContainer.appendChild(closeButton);
     const enhanceTryOnData = await getStorageData("enhanceTryOnData");
     console.log(enhanceTryOnData, "!!!!!!");
-    const { ethnic, sex, age, skinColor, bodyShape } = enhanceTryOnData;
+    const { ethnic, sex, age, skinColor, bodyShape } = enhanceTryOnData||{};
     console.log(
       ethnic,
       sex,
