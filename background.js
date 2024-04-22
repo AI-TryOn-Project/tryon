@@ -59,23 +59,20 @@ chrome.runtime.onMessage.addListener(async function (
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       const currentTab = tabs[0];
       const { formData } = message;
-      chrome.storage.local.set({ enhanceTryOnData: formData }, function() {
-        // This code doesn't execute until the storage is updated
-        chrome.storage.local.get(["lastRightClickedImageSrc"], function(result) {
-            fetchImageAsBase64(
-                result.lastRightClickedImageSrc,
-                (targetImageBase64) => {
-                    generateTryOn(
-                        targetImageBase64,
-                        result.lastRightClickedImageSrc,
-                        currentTab,
-                        currentTab.url,
-                        formData
-                    );
-                }
+      chrome.storage.local.set({ enhanceTryOnData: formData });
+      chrome.storage.local.get(["lastRightClickedImageSrc"], function (result) {
+        fetchImageAsBase64(
+          result.lastRightClickedImageSrc,
+          (targetImageBase64) => {
+            generateTryOn(
+              targetImageBase64,
+              result.lastRightClickedImageSrc,
+              currentTab,
+              currentTab.url
             );
-        });
-    });    
+          }
+        );
+      });
     });
   }
 });
@@ -117,28 +114,22 @@ function fetchImageAsBase64(url, callback) {
 }
 
 // This function sends the API request to your server
-async function sendApiRequest(
+function sendApiRequest(
   sourceImageBase64,
   targetImageBase64,
   lastRightClickedImageSrc,
   tab,
   pageUrl,
-  useLowRes,
-  formData = null
+  useLowRes
 ) {
   chrome.tabs.sendMessage(tab.id, {
     action: "showLoading",
   });
-  const getStorageData = (key) => {
-    return new Promise((resolve) => {
-      chrome.storage.local.get([key], function (result) {
-        resolve(result[key]);
-      });
-    });
-  };
-
-  // Asynchronously retrieve data from storage
-  const enhanceTryOnData = formData || await getStorageData("enhanceTryOnData") || {};
+  let enhanceTryOnData = {};
+  chrome.storage.local.get("enhanceTryOnData", function (result) {
+    enhanceTryOnData = result.enhanceTryOnData;
+  });
+  console.log("enhanceTryOnData", enhanceTryOnData);
   chrome.storage.local.get(["savedPrompt"], function (result) {
     const savedPrompt =
       result.savedPrompt || "fit woman, on the busy street, bright sunshine";
@@ -148,7 +139,6 @@ async function sendApiRequest(
       face: sourceImageBase64,
       prompt: savedPrompt, // Use the loaded prompt
       enhanceTryOnData: enhanceTryOnData,
-      pageUrl: pageUrl
     };
 
     fetch("https://tryon-advanced.tianlong.co.uk/upload/images", {
@@ -214,7 +204,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
-function generateTryOn(targetImageBase64, srcUrl, tab, pageUrl, formData=null) {
+function generateTryOn(targetImageBase64, srcUrl, tab, pageUrl) {
   // Assuming 'targetImage.png' is in the 'images' directory of your extension
   chrome.storage.local.get(["uploadedImage", "lowRes"], function (data) {
     const sourceImageBase64 = data.uploadedImage;
@@ -231,8 +221,7 @@ function generateTryOn(targetImageBase64, srcUrl, tab, pageUrl, formData=null) {
       srcUrl,
       tab,
       pageUrl,
-      useLowRes,
-      formData
+      useLowRes
     );
   });
 }
