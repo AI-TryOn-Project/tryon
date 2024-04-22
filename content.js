@@ -394,7 +394,9 @@ async function createPopup(imageBase64, sizeChartData, userDimensions) {
   closeButton.style.right = "10px";
 
   // Append the close button to the popup
-  popupContainer.appendChild(closeButton);
+  if(imageBase64){
+    popupContainer.appendChild(closeButton);
+  }
 
   // enhance button
   const enhanceButton = document.createElement("button");
