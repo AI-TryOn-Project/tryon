@@ -7,8 +7,12 @@
     "contextMenus",
     "storage",
     "activeTab",
-    "scripting"
+    "scripting",
+    "identity"
   ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
   "icons": {
     "16": "icon16.png",
     "48": "icon48.png",

@@ -1,3 +1,8 @@
+importScripts('node_modules/auth0-chrome/dist/auth0chrome.min.js');
+
+AUTH0_DOMAIN = 'dev-su6ulv21sz4eujhi.us.auth0.com'
+AUTH0_CLIENT_ID = 'eMao5XCf218XH2AgFtNYFIpOTRDcZh0T'
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "viewImage",
@@ -13,7 +18,31 @@ chrome.runtime.onMessage.addListener(async function (
 ) {
   console.log(message);
   console.log(message.action);
-  if (message.action === "capture") {
+  if (message.action === 'authenticate') {
+      console.log('authenticating');
+
+    // scope
+    //  - openid if you want an id_token returned
+    //  - offline_access if you want a refresh_token returned
+    // device
+    //  - required if requesting the offline_access scope.
+    let options = {
+      scope: 'openid offline_access profile',
+      device: 'chrome-extension'
+    };
+
+    new Auth0Chrome(AUTH0_DOMAIN, AUTH0_CLIENT_ID)
+      .authenticate(options)
+      .then(function (authResult) {
+        console.log('authResult', authResult); // FIXME: remove this
+        chrome.storage.local.set({authResult: authResult}, function() {
+          console.log('Authentication result saved to chrome.storage.local');
+        });
+      }).catch(function (err) {
+        console.log('err', err);
+    });
+  }
+  else if (message.action === "capture") {
     const base64ScreenShot = await chrome.tabs.captureVisibleTab();
     chrome.storage.local.get("bodyDimensionsIn", function (result) {
       const userDimensions = result.bodyDimensionsIn || {};
