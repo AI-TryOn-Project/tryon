@@ -33,7 +33,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "resources/bg.png"
+        "resources/bg.png",
+        "styles.css"
       ],
       "matches": [
         "<all_urls>"
