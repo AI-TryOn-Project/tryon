@@ -324,16 +324,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     chrome.storage.local.get('authResult', function(result) {
         if (result.authResult && result.authResult.id_token) {
-            console.log('User is logged in');
-            console.log(result.authResult.id_token);
-            const user = parseJwt(result.authResult.id_token);
-            console.log(user);
-
-            userInfo = getUserInfo(result.authResult.access_token);
-            //console.log(userInfo);
-
-            if (user && user.name) {
-                document.getElementById('username').textContent = user.name;
+            const userInfo = parseJwt(result.authResult.id_token);
+            console.log('User Info:', userInfo);
+            if (userInfo && userInfo.name) {
+                document.getElementById('username').textContent = userInfo.name;
+            } else {
+                console.log('Name not available in ID token.');
             }
         }
     });
