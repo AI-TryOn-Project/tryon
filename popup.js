@@ -14,6 +14,7 @@ function inchToCm(inches) {
 let storedInDim = []
 let storedCmDim = []
 
+
 function changeDimLabel(option){
     let labels = document.querySelectorAll(".tab-content-body-dim-text-label");
     labels.forEach(label => {
@@ -113,6 +114,12 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 /* Lifecycle methods end */
 
+document.getElementById('loginBtn').addEventListener('click', function() {
+    console.log('Sending login message');
+    chrome.runtime.sendMessage({action: 'authenticate'}, function(response) {
+        console.log('Login initiated', response);
+    });
+});
 // Save new values
 document.getElementById('saveDimBtn').addEventListener('click', function () {
     let measurementUnit = document.querySelector('.tab-content-body-dim-text-label').textContent;
@@ -266,12 +273,65 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+function parseJwt(token) {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+
+        return JSON.parse(jsonPayload);
+    } catch (e) {
+        return null;
+    }
+}
+
+function getUserInfo(accessToken) {
+    const url = 'https://dev-su6ulv21sz4eujhi.us.auth0.com/userinfo';
+    fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    })
+    .then(response => {
+        console.log('Raw Response:', response);  // Log the raw response object
+        if (!response.ok) {
+            throw new Error('Failed to fetch: ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(user => {
+        console.log('User Info:', user);  // Log the user info object
+        if (user.name) {
+            document.getElementById('username').textContent = user.name;
+        } else {
+            console.log('Name not available in user profile.');
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching user info:', error);
+    });
+}
+
 // Close btn logic
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('#closeBtn').forEach(function (element) {
         element.addEventListener('click', function () {
             window.close();
         });
+    });
+
+    chrome.storage.local.get('authResult', function(result) {
+        if (result.authResult && result.authResult.id_token) {
+            const userInfo = parseJwt(result.authResult.id_token);
+            console.log('User Info:', userInfo);
+            if (userInfo && userInfo.name) {
+                document.getElementById('username').textContent = userInfo.name;
+            } else {
+                console.log('Name not available in ID token.');
+            }
+        }
     });
 });
 
