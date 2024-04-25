@@ -1,4 +1,4 @@
-importScripts('node_modules/auth0-chrome/dist/auth0chrome.min.js');
+importScripts('auth0chrome.min.js');
 
 AUTH0_DOMAIN = 'dev-su6ulv21sz4eujhi.us.auth0.com'
 AUTH0_CLIENT_ID = 'eMao5XCf218XH2AgFtNYFIpOTRDcZh0T'

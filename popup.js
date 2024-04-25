@@ -287,33 +287,6 @@ function parseJwt(token) {
     }
 }
 
-function getUserInfo(accessToken) {
-    const url = 'https://dev-su6ulv21sz4eujhi.us.auth0.com/userinfo';
-    fetch(url, {
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    })
-    .then(response => {
-        console.log('Raw Response:', response);  // Log the raw response object
-        if (!response.ok) {
-            throw new Error('Failed to fetch: ' + response.statusText);
-        }
-        return response.json();
-    })
-    .then(user => {
-        console.log('User Info:', user);  // Log the user info object
-        if (user.name) {
-            document.getElementById('username').textContent = user.name;
-        } else {
-            console.log('Name not available in user profile.');
-        }
-    })
-    .catch(error => {
-        console.error('Error fetching user info:', error);
-    });
-}
-
 // Close btn logic
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('#closeBtn').forEach(function (element) {
