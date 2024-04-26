@@ -130,7 +130,7 @@ function logFormValues() {
             formData[element.id] = element.value;
         }
     }
-    document.getElementById("my-extension-image-popup").style.display = "none";
+    document.body.removeChild(document.getElementById("my-extension-image-popup"))
     console.log(formData);
     // 发送消息enhanceRegenerate
     chrome.runtime.sendMessage({
@@ -255,6 +255,7 @@ async function createPopup(imageBase64, sizeChartData, userDimensions) {
     imageContainerElement.appendChild(imageElement);
     // Create the size chart container
     const sizeChartContainer = document.createElement("div");
+    sizeChartContainer.id = 'tryon-sizeChartContainer'
     sizeChartContainer.style.flexGrow = sizeChartData ? "1" : "0"; // Adjust based on sizeChartData
     sizeChartContainer.style.maxWidth = sizeChartData ? "50%" : "0"; // Adjust max width based on sizeChartData
 
