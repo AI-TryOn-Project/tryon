@@ -178,8 +178,7 @@ async function createFormOverlay(enhanceTryOnData) {
         createSelect(
             "ethnic",
             [
-                "African",
-                "American",
+                "African American",
                 "Hispanic ",
                 "Asian",
                 "White",
@@ -234,7 +233,7 @@ async function createPopup(imageBase64, sizeChartData, userDimensions) {
     popupContainer.style.flexDirection = "row";
     popupContainer.style.alignItems = "start";
     popupContainer.style.padding = "10px";
-    popupContainer.style.width = sizeChartData ? "60vw" : "30vw"; // Adjust width as needed
+    popupContainer.style.width =  "60vw"; // Adjust width as needed
     popupContainer.style.maxHeight = "80vh";
     popupContainer.style.overflow = "auto";
 
