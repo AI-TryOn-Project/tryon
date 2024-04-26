@@ -69,7 +69,7 @@ chrome.runtime.onMessage.addListener(async function (
       const currentTab = tabs[0];
       generateTryOn(
         message.croppedDataUrl,
-        "https://img.shopcider.com/hermes/video/1681719531000-ehkmff.jpg",
+        null,
         currentTab,
         currentTab.url
       ); // fix me
@@ -164,7 +164,7 @@ function sendApiRequest(
       result.savedPrompt || "fit woman, on the busy street, bright sunshine";
 
     const data = {
-      model: lastRightClickedImageSrc,
+      model: lastRightClickedImageSrc || targetImageBase64,
       face: sourceImageBase64,
       prompt: savedPrompt, // Use the loaded prompt
       enhanceTryOnData: enhanceTryOnData,
