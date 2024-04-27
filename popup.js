@@ -114,12 +114,12 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 /* Lifecycle methods end */
 
-document.getElementById('loginBtn').addEventListener('click', function() {
-    console.log('Sending login message');
-    chrome.runtime.sendMessage({action: 'authenticate'}, function(response) {
-        console.log('Login initiated', response);
-    });
-});
+// document.getElementById('loginBtn').addEventListener('click', function() {
+//     console.log('Sending login message');
+//     chrome.runtime.sendMessage({action: 'authenticate'}, function(response) {
+//         console.log('Login initiated', response);
+//     });
+// });
 // Save new values
 document.getElementById('saveDimBtn').addEventListener('click', function () {
     let measurementUnit = document.querySelector('.tab-content-body-dim-text-label').textContent;
